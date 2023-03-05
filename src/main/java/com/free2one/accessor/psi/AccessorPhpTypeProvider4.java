@@ -16,6 +16,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider4;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 
@@ -28,7 +29,12 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
 
     @Override
     public @Nullable PhpType getType(PsiElement psiElement) {
-        if (psiElement.getContainingFile().getVirtualFile() == null) {
+        if (!(psiElement instanceof Variable) || !psiElement.textMatches("$this")) {
+            return null;
+        }
+        
+        if (psiElement.getContainingFile().getVirtualFile() == null ||
+                psiElement.getContainingFile().getVirtualFile().getPath().contains(psiElement.getProject().getBasePath() + File.separator + "vendor")) {
             return null;
         }
 
@@ -37,13 +43,8 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
             return null;
         }
 
-        if (!(psiElement instanceof Variable)) {
-            return null;
-        }
-
-        if (((Variable) psiElement).resolve() != null &&
-                ((Variable) psiElement).resolve() instanceof PhpClass phpClass
-        ) {
+        PsiElement targetElement = ((Variable) psiElement).resolve();
+        if (targetElement instanceof PhpClass phpClass) {
             Collection<PhpAttribute> attributes = phpClass.getAttributes(PhpAccessorClassnames.Data);
             if (attributes.isEmpty()) {
                 return null;
