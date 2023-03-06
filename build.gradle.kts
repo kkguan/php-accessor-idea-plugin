@@ -1,10 +1,13 @@
+fun properties(key: String) = project.findProperty(key).toString()
+
 plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.13.0"
+    id("org.jetbrains.changelog") version "2.0.0"
 }
 
 group = "com.free2one"
-version = "0.2.1"
+version = properties("pluginVersion")
 
 repositories {
     mavenCentral()
@@ -19,6 +22,11 @@ intellij {
     plugins.set(listOf("com.jetbrains.php"))
 }
 
+changelog {
+    version.set(properties("pluginVersion"))
+    groups.set(emptyList())
+}
+
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
@@ -31,6 +39,19 @@ tasks {
         untilBuild.set("231.*")
     }
 
+    patchPluginXml {
+        version.set(properties("pluginVersion"))
+        changeNotes.set(
+            file("src/main/resources/META-INF/change-notes.html").readText().replace("<html>", "")
+                .replace("</html>", "")
+        )
+//        changeNotes.set(provider {
+//            changelog.run {
+//                getOrNull(properties("pluginVersion")) ?: getLatest()
+//            }.toHTML()
+//        })
+    }
+
     signPlugin {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
         privateKey.set(System.getenv("PRIVATE_KEY"))
@@ -41,3 +62,5 @@ tasks {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
 }
+
+

@@ -6,6 +6,8 @@ import com.free2one.accessor.method.AccessorMethod;
 import com.free2one.accessor.settings.AccessorSettings;
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesHandlerFactory;
+import com.intellij.find.findUsages.FindUsagesOptions;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiUtilCore;
@@ -46,6 +48,14 @@ public class AccessorFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
 
         protected MyFindUsagesHandler(@NotNull PsiElement psiElement) {
             super(psiElement);
+        }
+
+
+        @Override
+        public @NotNull FindUsagesOptions getFindUsagesOptions(@Nullable DataContext dataContext) {
+            FindUsagesOptions options = super.getFindUsagesOptions(dataContext);
+            options.searchScope = new AccessorFindUsagesSearchScope(myPsiElement.getProject());
+            return options;
         }
 
         @Override

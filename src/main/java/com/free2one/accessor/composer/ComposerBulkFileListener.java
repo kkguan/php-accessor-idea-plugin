@@ -15,6 +15,7 @@ import com.jetbrains.php.lang.PhpFileType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,10 @@ public class ComposerBulkFileListener implements BulkFileListener {
     private void updateMetadata(VFileEvent vFileEvent) {
         if (vFileEvent.getFile() == null ||
                 !(vFileEvent.getFile().getFileType() instanceof PhpFileType)) {
+            return;
+        }
+
+        if (vFileEvent.getPath().contains(project.getBasePath() + File.separator + "vendor")) {
             return;
         }
 

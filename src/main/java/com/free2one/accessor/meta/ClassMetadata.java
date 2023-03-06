@@ -3,6 +3,8 @@ package com.free2one.accessor.meta;
 import com.free2one.accessor.method.AccessorMethod;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class ClassMetadata {
 
@@ -31,7 +33,7 @@ public class ClassMetadata {
     public String getClassname() {
         return classname;
     }
-    
+
     public String getAccessorClassname() {
         return accessorClassname;
     }
@@ -55,5 +57,12 @@ public class ClassMetadata {
         }
 
         return null;
+    }
+
+    public Collection<String> findMethodNamesFromFieldName(String fieldName) {
+        return methods.stream()
+                .filter(method -> method.getFieldName().equals(fieldName))
+                .map(AccessorMethod::getMethodName)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
