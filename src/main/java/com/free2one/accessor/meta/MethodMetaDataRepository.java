@@ -48,7 +48,7 @@ public class MethodMetaDataRepository {
             return null;
         }
 
-        file.refresh(true, false);
+//        file.refresh(false, false);
         try {
             String json = new String(file.getInputStream().readAllBytes());
             return gson.fromJson(json, ClassMetadata.class);
