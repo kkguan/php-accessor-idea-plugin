@@ -1,5 +1,6 @@
 package com.free2one.accessor.settings;
 
+import com.free2one.accessor.AccessorBundle;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
@@ -15,8 +16,8 @@ public class AccessorSettingsComponent {
 
     public AccessorSettingsComponent() {
         myMainPanel = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Proxy root directory: "), proxyRootDirectory, 1, false)
-                .addComponent(new JBLabel("Extra proxy directories(one per line)."))
+                .addLabeledComponent(new JBLabel(AccessorBundle.message("settings.proxy-root-directory.text")), proxyRootDirectory, 1, false)
+                .addComponent(new JBLabel(AccessorBundle.message("settings.extra-proxy-directories.text")))
                 .addComponent(new JBScrollPane(extraProxyDirectories))
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();

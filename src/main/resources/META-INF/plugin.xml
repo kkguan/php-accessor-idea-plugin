@@ -2,6 +2,7 @@
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>com.free2one.idea.php-accessor</id>
+    <resource-bundle>messages.AccessorBundle</resource-bundle>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
@@ -31,7 +32,7 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <postStartupActivity implementation="com.free2one.accessor.AccessorStartupActivity"/>
+        <postStartupActivity implementation="com.free2one.accessor.composer.ComposerStartupActivity"/>
         <!--        <psi.treeChangeListener implementation="com.free2one.accessor.psi.AccessorTreeChangeListener"/>-->
         <gotoDeclarationHandler
                 implementation="com.free2one.accessor.codeInsight.navigation.AccessorGotoDeclarationHandler"/>
@@ -39,8 +40,8 @@
                                 implementationClass="com.free2one.accessor.codeInsight.completion.AccessorCompletionContributor"/>
         <notificationGroup id="PHP Accessor Plugin" displayType="BALLOON"/>
 
-        <projectService
-                serviceImplementation="com.free2one.accessor.settings.AccessorSettings"/>
+        <projectService serviceImplementation="com.free2one.accessor.composer.ComposerPackageManager"/>
+        <projectService serviceImplementation="com.free2one.accessor.settings.AccessorSettings"/>
         <projectConfigurable
                 parentId="tools"
                 instance="com.free2one.accessor.settings.AccessorSettingsConfigurable"

@@ -4,11 +4,11 @@ import com.free2one.accessor.PhpAccessorClassnames;
 import com.free2one.accessor.meta.ClassMetadata;
 import com.free2one.accessor.meta.MethodMetaDataRepository;
 import com.free2one.accessor.settings.AccessorSettings;
+import com.free2one.accessor.util.AnnotationSearchUtil;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.PhpAttribute;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.Variable;
@@ -32,7 +32,7 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
         if (!(psiElement instanceof Variable) || !psiElement.textMatches("$this")) {
             return null;
         }
-        
+
         if (psiElement.getContainingFile().getVirtualFile() == null ||
                 psiElement.getContainingFile().getVirtualFile().getPath().contains(psiElement.getProject().getBasePath() + File.separator + "vendor")) {
             return null;
@@ -45,8 +45,7 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
 
         PsiElement targetElement = ((Variable) psiElement).resolve();
         if (targetElement instanceof PhpClass phpClass) {
-            Collection<PhpAttribute> attributes = phpClass.getAttributes(PhpAccessorClassnames.Data);
-            if (attributes.isEmpty()) {
+            if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
                 return null;
             }
 

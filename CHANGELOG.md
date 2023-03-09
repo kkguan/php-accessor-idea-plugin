@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.5
+
+* Feature 依赖环境检测及引导
+* Feature 中文支持
+* Refactor 优化生成逻辑
+
 ## 0.2.4
 
 * Fix 解决遗留Bug
@@ -12,4 +18,4 @@
 ## 0.2.2
 
 * Feature 类字段支持查找及重构
-* Fix 修复vender目录下会生成代理类的问题
+* Fix 修复vendor目录下会生成代理类的问题

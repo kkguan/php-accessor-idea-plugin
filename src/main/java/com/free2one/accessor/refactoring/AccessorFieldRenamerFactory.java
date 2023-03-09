@@ -3,6 +3,7 @@ package com.free2one.accessor.refactoring;
 import com.free2one.accessor.PhpAccessorClassnames;
 import com.free2one.accessor.meta.ClassMetadata;
 import com.free2one.accessor.meta.MethodMetaDataRepository;
+import com.free2one.accessor.util.AnnotationSearchUtil;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.refactoring.rename.UnresolvableCollisionUsageInfo;
@@ -12,7 +13,10 @@ import com.jetbrains.php.PhpBundle;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.intentions.generators.PhpAccessorsGenerator;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.Field;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.Parameter;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.refactoring.rename.automaticRenamers.FieldAccessorsRenamerFactory;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,9 +45,8 @@ public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
             if (phpClass == null) {
                 return;
             }
-
-            Collection<PhpAttribute> attributes = phpClass.getAttributes(PhpAccessorClassnames.Data);
-            if (attributes.isEmpty()) {
+            
+            if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
                 return;
             }
 
