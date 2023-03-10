@@ -56,6 +56,12 @@
                                    implementationClass="com.free2one.accessor.codeInspection.MultipleClassDeclarationsInspectionSuppressor"/>
     </extensions>
 
+    <applicationListeners>
+        <listener class="com.free2one.accessor.composer.ComposerBulkFileListener"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </applicationListeners>
+
+
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider4 implementation="com.free2one.accessor.psi.AccessorPhpTypeProvider4"/>
     </extensions>
