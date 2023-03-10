@@ -12,7 +12,6 @@ import com.intellij.usageView.UsageInfo;
 import com.jetbrains.php.PhpBundle;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLangUtil;
-import com.jetbrains.php.lang.intentions.generators.PhpAccessorsGenerator;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
@@ -20,10 +19,11 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.refactoring.rename.automaticRenamers.FieldAccessorsRenamerFactory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
     @Override
@@ -45,7 +45,7 @@ public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
             if (phpClass == null) {
                 return;
             }
-            
+
             if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
                 return;
             }
@@ -59,23 +59,24 @@ public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
             }
 
             String fieldName = field.getName();
+            Collection<String> methodNames = classMetadata.findMethodNamesFromFieldName(fieldName);
+            if (methodNames.isEmpty()) {
+                return;
+            }
+
             ReadAction.compute(() -> {
                 Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(phpClass.getProject()).getTraitsByName(classMetadata.getAccessorClassname());
                 for (PhpClass clazz : phpNamedElements) {
-                    PhpAccessorsGenerator accessorsGenerator = new PhpAccessorsGenerator(clazz, field);
-                    this.myElements.addAll(Arrays.asList(accessorsGenerator.findGetters()));
-                    Method[] setters = accessorsGenerator.findSetters();
-                    this.myElements.addAll(Arrays.asList(setters));
-                    Method[] var7 = setters;
-                    int var8 = setters.length;
-
-                    for (int var9 = 0; var9 < var8; ++var9) {
-                        Method setter = var7[var9];
-                        Parameter[] parameters = setter.getParameters();
+                    Collection<Method> elements = clazz.getMethods().stream()
+                            .filter(method -> methodNames.stream().anyMatch(name -> name.equals(method.getName())))
+                            .collect(Collectors.toCollection(ArrayList::new));
+                    this.myElements.addAll(elements);
+                    elements.forEach(method -> {
+                        Parameter[] parameters = method.getParameters();
                         if (parameters.length == 1 && PhpLangUtil.equalsFieldNames(parameters[0].getName(), fieldName)) {
                             this.myElements.add(parameters[0]);
                         }
-                    }
+                    });
                 }
                 return null;
             });

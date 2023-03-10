@@ -8,15 +8,12 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.newvfs.BulkFileListener;
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.jetbrains.php.composer.ComposerConfigListener;
 import com.jetbrains.php.composer.ComposerDataService;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class EnvironmentDetectorManager {
@@ -107,31 +104,31 @@ public class EnvironmentDetectorManager {
     }
 
 
-    public static class MyComposerJsonListener implements BulkFileListener {
-
-        private final EnvironmentDetectorManager manager;
-
-        public MyComposerJsonListener(EnvironmentDetectorManager manager) {
-            this.manager = manager;
-        }
-
-        @Override
-        public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
-            ComposerDataService composerDataService = manager.getProject().getService(ComposerDataService.class);
-            String configPath = composerDataService.getConfigPath();
-            if (configPath == null) {
-                return;
-            }
-
-            boolean isPending = events.stream().anyMatch(vFileEvent -> {
-                        System.out.println(vFileEvent.getPath());
-                        return configPath.equals(vFileEvent.getPath());
-                    }
-            );
-            if (isPending) {
-                manager.scan(PackageInstallationDetector.class);
-            }
-        }
-    }
+//    public static class MyComposerJsonListener implements BulkFileListener {
+//
+//        private final EnvironmentDetectorManager manager;
+//
+//        public MyComposerJsonListener(EnvironmentDetectorManager manager) {
+//            this.manager = manager;
+//        }
+//
+//        @Override
+//        public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
+//            ComposerDataService composerDataService = manager.getProject().getService(ComposerDataService.class);
+//            String configPath = composerDataService.getConfigPath();
+//            if (configPath == null) {
+//                return;
+//            }
+//
+//            boolean isPending = events.stream().anyMatch(vFileEvent -> {
+//                        System.out.println(vFileEvent.getPath());
+//                        return configPath.equals(vFileEvent.getPath());
+//                    }
+//            );
+//            if (isPending) {
+//                manager.scan(PackageInstallationDetector.class);
+//            }
+//        }
+//    }
 
 }

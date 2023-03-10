@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+* Fix 修复默认路径WIN下可能导致的异常
+* Refactor 去除对Phpstorm内置PhpAccessorsGenerator的依赖
+
 ## 0.2.5
 
 * Feature 依赖环境检测及引导

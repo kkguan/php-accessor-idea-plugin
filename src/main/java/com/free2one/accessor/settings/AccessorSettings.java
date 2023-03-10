@@ -46,7 +46,7 @@ public final class AccessorSettings implements PersistentStateComponent<Accessor
     }
 
     public String[] getExtraProxyDirectories() {
-        return Objects.requireNonNullElseGet(extraProxyDirectories, () -> new String[]{project.getBasePath() + File.separator + "runtime"});
+        return Objects.requireNonNullElseGet(extraProxyDirectories, () -> new String[]{project.getBasePath() + getFileSeparator() + "runtime"});
     }
 
     public void setExtraProxyDirectories(String[] extraProxyDirectories) {
@@ -92,12 +92,25 @@ public final class AccessorSettings implements PersistentStateComponent<Accessor
 
     public String getProxyRootDirectory() {
         if (proxyRootDirectory == null) {
-            return project.getBasePath() + File.separator + ".php-accessor";
+            return project.getBasePath() + getFileSeparator() + ".php-accessor";
         }
         return proxyRootDirectory;
     }
 
     public void setProxyRootDirectory(String proxyRootDirectory) {
         this.proxyRootDirectory = proxyRootDirectory;
+    }
+
+    private String getFileSeparator() {
+        String separator;
+        if (project.getBasePath().lastIndexOf("/") != -1) {
+            separator = "/";
+        } else if (project.getBasePath().lastIndexOf("\\") != -1) {
+            separator = "\\";
+        } else {
+            separator = File.separator;
+        }
+        
+        return separator;
     }
 }

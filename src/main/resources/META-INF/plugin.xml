@@ -20,7 +20,7 @@
 <ul>
     <li>Confirm that composer has been configured in "Settings -> PHP -> Composer -> Execution"</li>
     <li>Install <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>(Use  <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a> for Hyperf framework)</li>
-    <li>Configure <code>{"scripts":{"php-accessor":"php-accessor generate $1"}}</code>  to your <code>composer.json</code> file</li>
+    <li>Configure <code>{"scripts":{"php-accessor": "@php vendor/bin/php-accessor generate"}}</code>  to your <code>composer.json</code> file</li>
 </ul>
   ]]></description>
 

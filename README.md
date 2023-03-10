@@ -12,8 +12,7 @@
 
 #### - 支持对类属性字段的"<a href="https://www.jetbrains.com/help/idea/refactoring-source-code.html">重命名重构</a>"，重构字段时将同步修改访问器及相关调用位置
 
-快速入门
------------
+## 快速入门
 
 ### 安装
 
@@ -28,9 +27,16 @@
 ```json
 {
   "scripts": {
-    "php-accessor": "php-accessor generate $1"
+    "php-accessor": "@php vendor/bin/php-accessor generate"
   }
 }
 ```
 
-## 待补充......
+## 相关资源
+
+#### <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>: 生成类访问器（Getter & Setter）
+
+#### <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a>: 服务启动时将自动生成访问器代理类,同时对原始类进行替换.
+
+
+
