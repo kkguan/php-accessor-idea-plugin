@@ -27,17 +27,31 @@ public class PackageInstallationDetector implements EnvironmentDetector {
             return;
         }
 
+
         ComposerPackage composerPackage = project.getService(ComposerPackageManager.class).findPackage(ComposerPackageManager.DependentPackage.PHP_ACCESSOR);
         if (composerPackage != null) {
             return;
         }
 
-        NotificationUtil.notify(project, AccessorBundle.message("composer.php-accessor.not.found"), new NotificationAction(AccessorBundle.message("composer.php-accessor.install")) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
-                project.getService(ComposerPackageManager.class).installPackage(ComposerPackageManager.DependentPackage.PHP_ACCESSOR, composerDataService.getConfigFile());
-                notification.expire();
-            }
-        });
+        ComposerPackage hyperfPackage = project.getService(ComposerPackageManager.class).findPackage(ComposerPackageManager.DependentPackage.HYPERF_FRAMEWORK);
+        if (hyperfPackage != null) {
+            NotificationUtil.notify(project, AccessorBundle.message("composer.hyperf-php-accessor.not.found"), new NotificationAction(AccessorBundle.message("composer.php-accessor.install")) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
+                    project.getService(ComposerPackageManager.class).installPackage(ComposerPackageManager.DependentPackage.HYPERF_PHP_ACCESSOR, composerDataService.getConfigFile());
+                    notification.expire();
+                }
+            });
+        } else {
+            NotificationUtil.notify(project, AccessorBundle.message("composer.php-accessor.not.found"), new NotificationAction(AccessorBundle.message("composer.php-accessor.install")) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
+                    project.getService(ComposerPackageManager.class).installPackage(ComposerPackageManager.DependentPackage.PHP_ACCESSOR, composerDataService.getConfigFile());
+                    notification.expire();
+                }
+            });
+        }
+
+
     }
 }

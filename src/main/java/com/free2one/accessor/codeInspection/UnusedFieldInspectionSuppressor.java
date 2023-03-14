@@ -18,26 +18,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class UnusedPrivateFieldInspectionSuppressor implements InspectionSuppressor {
+public class UnusedFieldInspectionSuppressor {
 
-    @Override
-    public boolean isSuppressedFor(@NotNull PsiElement element, @NotNull String toolId) {
-        if (!toolId.equals("PhpUnusedPrivateFieldInspection")) {
-            return false;
-        }
-
-        PsiElement parentElement = element.getParent();
-        if (!(parentElement instanceof Field field) ||
+    private static boolean fieldHasAccessor(PsiElement element) {
+        if (!(element instanceof Field field) ||
                 field.getContainingClass() == null) {
             return false;
         }
 
         PhpClass phpClass = field.getContainingClass();
-        if (phpClass.getProject().getService(AccessorSettings.class)
-                .containProxyDirectory(phpClass.getContainingFile().getVirtualFile().getPath())) {
+        if (phpClass == null ||
+                phpClass.getProject().getService(AccessorSettings.class)
+                        .containProxyDirectory(phpClass.getContainingFile().getVirtualFile().getPath())) {
             return false;
         }
-
 
         return ReadAction.compute(() -> {
             MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(phpClass.getProject());
@@ -70,8 +64,36 @@ public class UnusedPrivateFieldInspectionSuppressor implements InspectionSuppres
         });
     }
 
-    @Override
-    public SuppressQuickFix @NotNull [] getSuppressActions(@Nullable PsiElement element, @NotNull String toolId) {
-        return new SuppressQuickFix[0];
+    static class PropertyOnlyWrittenInspectionSuppressor implements InspectionSuppressor {
+        @Override
+        public boolean isSuppressedFor(@NotNull PsiElement element, @NotNull String toolId) {
+            if (!toolId.equals("PhpPropertyOnlyWrittenInspection")) {
+                return false;
+            }
+
+            return UnusedFieldInspectionSuppressor.fieldHasAccessor(element);
+        }
+
+        @Override
+        public SuppressQuickFix @NotNull [] getSuppressActions(@Nullable PsiElement element, @NotNull String toolId) {
+            return new SuppressQuickFix[0];
+        }
     }
+
+    static class UnusedPrivateFieldInspectionSuppressor implements InspectionSuppressor {
+        @Override
+        public boolean isSuppressedFor(@NotNull PsiElement element, @NotNull String toolId) {
+            if (!toolId.equals("PhpUnusedPrivateFieldInspection")) {
+                return false;
+            }
+
+            return UnusedFieldInspectionSuppressor.fieldHasAccessor(element.getParent());
+        }
+
+        @Override
+        public SuppressQuickFix @NotNull [] getSuppressActions(@Nullable PsiElement element, @NotNull String toolId) {
+            return new SuppressQuickFix[0];
+        }
+    }
+
 }

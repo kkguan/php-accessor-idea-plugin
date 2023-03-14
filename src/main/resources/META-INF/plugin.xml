@@ -51,9 +51,11 @@
         <automaticRenamerFactory
                 implementation="com.free2one.accessor.refactoring.AccessorFieldRenamerFactory"/>
         <lang.inspectionSuppressor language="PHP"
-                                   implementationClass="com.free2one.accessor.codeInspection.UnusedPrivateFieldInspectionSuppressor"/>
+                                   implementationClass="com.free2one.accessor.codeInspection.UnusedFieldInspectionSuppressor$UnusedPrivateFieldInspectionSuppressor"/>
         <lang.inspectionSuppressor language="PHP"
                                    implementationClass="com.free2one.accessor.codeInspection.MultipleClassDeclarationsInspectionSuppressor"/>
+        <lang.inspectionSuppressor language="PHP"
+                                   implementationClass="com.free2one.accessor.codeInspection.UnusedFieldInspectionSuppressor$PropertyOnlyWrittenInspectionSuppressor"/>
     </extensions>
 
     <applicationListeners>
