@@ -49,10 +49,12 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
                 return null;
             }
 
-            ClassMetadata classMetadata = ReadAction.compute(() -> {
-                MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
-                return methodMetaDataRepository.getFromClassname(phpClass.getFQN());
-            });
+//            ClassMetadata classMetadata = ReadAction.compute(() -> {
+//                MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
+//                return methodMetaDataRepository.getFromClassname(phpClass.getFQN());
+//            });
+            MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
+            ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
             if (classMetadata == null) {
                 return null;
             }

@@ -10,6 +10,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectLocator;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
+import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -115,7 +116,8 @@ public class ComposerBulkFileListener implements BulkFileListener {
 //    }
 
     private boolean isPendingFile(VFileEvent vFileEvent, AccessorSettings settings, Project project) {
-        if (vFileEvent.getFile() == null ||
+        if (vFileEvent instanceof VFileDeleteEvent ||
+                vFileEvent.getFile() == null ||
                 !(vFileEvent.getFile().getFileType() instanceof PhpFileType) ||
                 vFileEvent.getPath().contains(project.getBasePath() + File.separator + "vendor")) {
             return false;

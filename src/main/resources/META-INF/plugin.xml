@@ -56,6 +56,13 @@
                                    implementationClass="com.free2one.accessor.codeInspection.MultipleClassDeclarationsInspectionSuppressor"/>
         <lang.inspectionSuppressor language="PHP"
                                    implementationClass="com.free2one.accessor.codeInspection.UnusedFieldInspectionSuppressor$PropertyOnlyWrittenInspectionSuppressor"/>
+        <lang.inspectionSuppressor language="PHP"
+                                   implementationClass="com.free2one.accessor.codeInspection.UndefinedMethodInspectionSuppressor"/>
+        <localInspection language="PHP" groupPath="PHP" shortName="UndefinedMethodInspection"
+                         groupKey="inspection.php.group.undefined" enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.free2one.accessor.codeInspection.UndefinedMethodInspection"
+                         key="inspection.php.undefined.method.inspection.display.name" bundle="messages.PhpBundle"/>
     </extensions>
 
     <applicationListeners>
