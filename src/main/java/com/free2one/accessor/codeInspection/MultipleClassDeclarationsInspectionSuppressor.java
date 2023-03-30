@@ -28,7 +28,7 @@ public class MultipleClassDeclarationsInspectionSuppressor implements Inspection
         if (parentElement instanceof PhpClass phpClass) {
             return metadataExisted(phpClass.getProject(), phpClass.getFQN());
         }
-        
+
         return false;
     }
 
