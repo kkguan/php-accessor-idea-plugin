@@ -16,6 +16,11 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
 <p>Generate getter and setter methods automatically for PHP</p>
+<br/>
+<h1>PHP Accessor IDEA Plugin</h1>
+<br/>
+<a href="https://github.com/kkguan/php-accessor-idea-plugin">GitHub</a>
+<br/>
 <h2>Install</h2>
 <ul>
     <li>Confirm that composer has been configured in <code>Settings -> PHP -> Composer -> Execution</code></li>

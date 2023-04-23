@@ -12,6 +12,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.Variable;
+import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider4;
 import org.jetbrains.annotations.Nullable;
@@ -43,20 +44,20 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
             return null;
         }
 
-        PsiElement targetElement = ((Variable) psiElement).resolve();
-        if (targetElement instanceof PhpClass phpClass) {
-            if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
-                return null;
+        Collection<? extends PhpNamedElement> phpNamedElements = ((VariableImpl) psiElement).resolveLocal();
+        for (PhpNamedElement phpNamedElement : phpNamedElements) {
+            if (!(phpNamedElement instanceof PhpClass phpClass)) {
+                continue;
             }
 
-//            ClassMetadata classMetadata = ReadAction.compute(() -> {
-//                MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
-//                return methodMetaDataRepository.getFromClassname(phpClass.getFQN());
-//            });
+            if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
+                continue;
+            }
+
             MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
             ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
             if (classMetadata == null) {
-                return null;
+                continue;
             }
 
             PhpType phpType = new PhpType();

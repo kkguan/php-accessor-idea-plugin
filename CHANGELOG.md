@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.4
+
+* Fix 修复PhpTypeProvider4可能导致的异常
+
 ## 0.3.3
 
 * Feature 抑制"方法未找到"弱警告
