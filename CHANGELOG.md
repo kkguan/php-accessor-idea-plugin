@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5
+
+* Feature 支持 232.* 版本
+
 ## 0.3.4
 
 * Fix 修复PhpTypeProvider4可能导致的异常
