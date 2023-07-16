@@ -75,6 +75,7 @@
                          level="WARNING"
                          implementationClass="com.free2one.accessor.codeInspection.UndefinedMethodInspection"
                          key="inspection.php.undefined.method.inspection.display.name" bundle="messages.PhpBundle"/>
+        <gutterMarkPreprocessor implementation="com.free2one.accessor.codeInsight.AccessorGutterMarkPreprocessor"/>
     </extensions>
 
     <applicationListeners>
@@ -86,6 +87,19 @@
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider4 implementation="com.free2one.accessor.psi.AccessorPhpTypeProvider4"/>
     </extensions>
+
+
+    <actions>
+        <group id="PHPAccessor" text="PHP Accessor" popup="true" icon="/icons/accessor.png">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="ReplaceInPath"/>
+        </group>
+        <!-- 创建Halo Basic -->
+        <action class="com.free2one.accessor.actions.GenerateAccessorAction"
+                id="accessor.actions.generate-accessor-action" description="Generate accessors">
+            <add-to-group group-id="PHPAccessor"/>
+        </action>
+
+    </actions>
 
 
 </idea-plugin>
