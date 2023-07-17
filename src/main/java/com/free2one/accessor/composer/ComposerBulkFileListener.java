@@ -31,15 +31,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class ComposerBulkFileListener implements BulkFileListener {
-
-    private final Project project = null;
-
+    
     public ComposerBulkFileListener() {
     }
-
-//    public ComposerBulkFileListener(Project project) {
-//        this.project = project;
-//    }
 
     @Override
     public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
@@ -84,36 +78,6 @@ public class ComposerBulkFileListener implements BulkFileListener {
             SwingUtilities.invokeLater(() -> ProgressManager.getInstance().run(task));
         }
     }
-
-//    private void generateProxy(VFileEvent vFileEvent) {
-//        AccessorSettings settings = project.getService(AccessorSettings.class);
-//        if (!isPendingFile(vFileEvent, settings)) {
-//            return;
-//        }
-//
-//        ArrayList<String> commandLineOptions = new ArrayList<>();
-//        commandLineOptions.add(vFileEvent.getFile().getPath());
-//        commandLineOptions.add("-d");
-//        commandLineOptions.add(project.getBasePath());
-//        commandLineOptions.add("--");
-//        commandLineOptions.add("--dir=" + settings.getProxyRootDirectory());
-//        commandLineOptions.add("--gen-meta=yes");
-//        List<String> command = ComposerUtils.getRunScriptCommand("php-accessor", commandLineOptions);
-//        ComposerExecution composer = ComposerDataService.getInstance(project).getComposerExecution();
-//        Task.Backgroundable task = new Task.Backgroundable(project, AccessorBundle.message("composer.generate-proxy.task.title")) {
-//            @Override
-//            public void run(@NotNull ProgressIndicator indicator) {
-//                ComposerCommandRunner runner = new ComposerCommandRunner(composer, project, project.getBasePath(), new ComposerProgressIndicator());
-//                ComposerCommandRunner.ExecutionResult result = runner.runCommand(command, new ComposerProcessListener());
-//            }
-//        };
-//        if (SwingUtilities.isEventDispatchThread()) {
-//            ProgressManager.getInstance().run(task);
-//        } else {
-//            // Run the scan task when the thread is in the foreground.
-//            SwingUtilities.invokeLater(() -> ProgressManager.getInstance().run(task));
-//        }
-//    }
 
     private boolean isPendingFile(VFileEvent vFileEvent, AccessorSettings settings, Project project) {
         if (vFileEvent instanceof VFileDeleteEvent ||

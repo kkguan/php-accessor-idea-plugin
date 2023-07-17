@@ -90,7 +90,7 @@
 
 
     <actions>
-        <group id="PHPAccessor" text="PHP Accessor" popup="true" icon="/icons/accessor.png">
+        <group id="PHPAccessor" text="PHP Accessor" popup="true" icon="com.free2one.accessor.AccessorIcons.ACCESSOR">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="ReplaceInPath"/>
         </group>
         <!-- 创建Halo Basic -->

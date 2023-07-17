@@ -6,7 +6,6 @@ import com.free2one.accessor.meta.MethodMetaDataRepository;
 import com.free2one.accessor.util.AnnotationSearchUtil;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.psi.PsiElement;
-import com.intellij.refactoring.rename.UnresolvableCollisionUsageInfo;
 import com.intellij.refactoring.rename.naming.AutomaticRenamer;
 import com.intellij.usageView.UsageInfo;
 import com.jetbrains.php.PhpBundle;
@@ -21,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
@@ -34,10 +31,10 @@ public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
 
     public static class MyFieldAccessorsRenamer extends AutomaticRenamer {
 
-        @Override
-        public void findUsages(List<UsageInfo> result, boolean searchInStringsAndComments, boolean searchInNonJavaFiles, List<UnresolvableCollisionUsageInfo> unresolvedUsages, Map<PsiElement, String> allRenames) {
-            super.findUsages(result, searchInStringsAndComments, searchInNonJavaFiles, unresolvedUsages, allRenames);
-        }
+//        @Override
+//        public void findUsages(List<UsageInfo> result, boolean searchInStringsAndComments, boolean searchInNonJavaFiles, List<UnresolvableCollisionUsageInfo> unresolvedUsages, Map<PsiElement, String> allRenames) {
+//            super.findUsages(result, searchInStringsAndComments, searchInNonJavaFiles, unresolvedUsages, allRenames);
+//        }
 
         public MyFieldAccessorsRenamer(@NotNull Field field, @NotNull String newName) {
             super();
@@ -84,6 +81,10 @@ public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
             this.suggestAllNames(fieldName, newName);
         }
 
+        public boolean isSelectedByDefault() {
+            return true;
+        }
+
         public String getDialogTitle() {
             return PhpBundle.message("refactoring.rename.automatic.renamer.field.accessors.dialog.title", new Object[0]);
         }
@@ -94,10 +95,6 @@ public class AccessorFieldRenamerFactory extends FieldAccessorsRenamerFactory {
 
         public String entityName() {
             return PhpBundle.message("refactoring.rename.automatic.renamer.field.accessors.entity.name", new Object[0]);
-        }
-
-        public boolean isSelectedByDefault() {
-            return true;
         }
     }
 }

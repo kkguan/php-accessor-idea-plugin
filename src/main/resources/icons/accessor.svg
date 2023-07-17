@@ -1,0 +1,25 @@
+<svg width="13" height="13" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg"
+>
+    <defs>
+        <linearGradient x1="100%" y1="47.0596277%" x2="-3.1918912e-14%" y2="47.0596277%"
+                        id="linearGradient-t0cmobrddj-1">
+            <stop stop-color="#F546F1" offset="0%"></stop>
+            <stop stop-color="#B345F1" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="页面-1备份-3" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="url(#linearGradient-t0cmobrddj-1)" x="0" y="0" width="80" height="80" rx="17"></rect>
+        <g id="编组" transform="translate(16, 9.8645)" fill="#FFFFFF">
+            <rect id="矩形" transform="translate(36.3449, 12.8597) rotate(41) translate(-36.3449, -12.8597)"
+                  x="21.3448798" y="8.85972376" width="30" height="8" rx="4"></rect>
+            <rect id="矩形" x="0" y="16.135456" width="49" height="10" rx="5"></rect>
+        </g>
+        <g id="编组"
+           transform="translate(39.1449, 57.9323) scale(-1, -1) translate(-39.1449, -57.9323)translate(14, 44.8645)"
+           fill="#FFFFFF">
+            <rect id="矩形" transform="translate(36.3449, 12.8597) rotate(41) translate(-36.3449, -12.8597)"
+                  x="21.3448798" y="8.85972376" width="30" height="8" rx="4"></rect>
+            <rect id="矩形" x="0" y="16.135456" width="49" height="10" rx="5"></rect>
+        </g>
+    </g>
+</svg>
