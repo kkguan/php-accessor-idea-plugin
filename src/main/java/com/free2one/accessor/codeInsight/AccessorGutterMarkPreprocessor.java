@@ -36,7 +36,7 @@ public class AccessorGutterMarkPreprocessor implements GutterMarkPreprocessor {
     @Override
     public @NotNull List<GutterMark> processMarkers(@NotNull List<GutterMark> list) {
         for (GutterMark mark : list) {
-            if (!(mark instanceof LineMarkerInfo.LineMarkerGutterIconRenderer markerGutterIconRenderer) ||
+            if (!(mark instanceof LineMarkerInfo.LineMarkerGutterIconRenderer<? extends PsiElement> markerGutterIconRenderer) ||
                     markerGutterIconRenderer.getLineMarkerInfo().getNavigationHandler() == null
             ) {
                 continue;
@@ -52,13 +52,13 @@ public class AccessorGutterMarkPreprocessor implements GutterMarkPreprocessor {
     }
 
     private static class ReplacePhpGutterIconNavigationHandler extends ReplaceHandler {
-        public boolean replace(LineMarkerInfo.LineMarkerGutterIconRenderer markerGutterIconRenderer) {
+        public boolean replace(LineMarkerInfo.LineMarkerGutterIconRenderer<? extends PsiElement> markerGutterIconRenderer) {
             if (!markerGutterIconRenderer.getLineMarkerInfo().getNavigationHandler().getClass().getName().equals("com.jetbrains.php.lang.PhpLineMarkerProvider$PhpGutterIconNavigationHandler")) {
                 return false;
             }
 
             try {
-                Class<? extends LineMarkerInfo> lineMarker = markerGutterIconRenderer.getLineMarkerInfo().getClass();
+                Class<?> lineMarker = markerGutterIconRenderer.getLineMarkerInfo().getClass();
                 java.lang.reflect.Field myNavigationHandler = lineMarker.getDeclaredField("myNavigationHandler");
                 myNavigationHandler.setAccessible(true);
 
@@ -91,13 +91,13 @@ public class AccessorGutterMarkPreprocessor implements GutterMarkPreprocessor {
     }
 
     private static class ReplacePhpClassGutterIconNavigationHandler extends ReplaceHandler {
-        public boolean replace(LineMarkerInfo.LineMarkerGutterIconRenderer markerGutterIconRenderer) {
+        public boolean replace(LineMarkerInfo.LineMarkerGutterIconRenderer<? extends PsiElement> markerGutterIconRenderer) {
             if (!markerGutterIconRenderer.getLineMarkerInfo().getNavigationHandler().getClass().getName().equals("com.jetbrains.php.lang.PhpLineMarkerProvider$PhpClassGutterIconNavigationHandler")) {
                 return false;
             }
 
             try {
-                Class<? extends LineMarkerInfo> lineMarker = markerGutterIconRenderer.getLineMarkerInfo().getClass();
+                Class<?> lineMarker = markerGutterIconRenderer.getLineMarkerInfo().getClass();
                 java.lang.reflect.Field myNavigationHandler = lineMarker.getDeclaredField("myNavigationHandler");
                 myNavigationHandler.setAccessible(true);
 
@@ -141,7 +141,7 @@ public class AccessorGutterMarkPreprocessor implements GutterMarkPreprocessor {
     }
 
     abstract public static class ReplaceHandler {
-        abstract boolean replace(LineMarkerInfo.LineMarkerGutterIconRenderer markerGutterIconRenderer);
+        abstract boolean replace(LineMarkerInfo.LineMarkerGutterIconRenderer<? extends PsiElement> markerGutterIconRenderer);
 
         Collection<PhpClass> getSubclasses(PhpClass phpClass) {
             PhpIndex phpIndex = PhpIndex.getInstance(phpClass.getProject());
@@ -149,7 +149,7 @@ public class AccessorGutterMarkPreprocessor implements GutterMarkPreprocessor {
                 return phpIndex.getTraitUsages(phpClass);
             }
 
-            Collection<PhpClass> subclasses = new LinkedHashSet();
+            Collection<PhpClass> subclasses = new LinkedHashSet<>();
             phpIndex.processAllSubclasses(phpClass.getFQN(), clazz -> {
                 subclasses.add(clazz);
                 return true;
@@ -158,7 +158,7 @@ public class AccessorGutterMarkPreprocessor implements GutterMarkPreprocessor {
             return subclasses;
         }
 
-        class PhpGutterIconNavigationHandler implements GutterIconNavigationHandler<PsiElement> {
+        static class PhpGutterIconNavigationHandler implements GutterIconNavigationHandler<PsiElement> {
             private final Collection<? extends SmartPsiElementPointer<? extends PhpNamedElement>> myList;
             private final @Nls String myTitle;
             private final @Nls String myPinTitle;

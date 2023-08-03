@@ -54,6 +54,7 @@
 
         <projectService serviceImplementation="com.free2one.accessor.composer.ComposerPackageManager"/>
         <projectService serviceImplementation="com.free2one.accessor.settings.AccessorSettings"/>
+        <projectService serviceImplementation="com.free2one.accessor.AccessorFinderService"/>
         <projectConfigurable
                 parentId="tools"
                 instance="com.free2one.accessor.settings.AccessorSettingsConfigurable"

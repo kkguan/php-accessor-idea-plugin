@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.Variable;
@@ -23,16 +24,82 @@ import java.util.Set;
 
 public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
 
-    @Override
-    public char getKey() {
-        return 'Ȣ';
+    public static final char key = 'Ȣ';
+
+    private static final TypeHandler[] HANDLER;
+
+    static {
+        HANDLER = new TypeHandler[]{new ParameterHandler(), new VariableThisHandler()};
+    }
+
+    public interface TypeHandler {
+        PhpType getType(PsiElement psiElement);
+    }
+
+    private static class ParameterHandler implements TypeHandler {
+        public PhpType getType(PsiElement psiElement) {
+
+            if (!(psiElement instanceof Parameter)) {
+                return null;
+            }
+
+            PhpType type = ((Parameter) psiElement).getDeclaredType();
+            MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
+            for (String classname : type.getTypes()) {
+                ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(classname);
+                if (classMetadata == null) {
+                    continue;
+                }
+
+                PhpType phpType = new PhpType();
+                phpType.add("#" + key + classname + key);
+                return phpType;
+            }
+
+            return null;
+        }
+    }
+
+    private static class VariableThisHandler implements TypeHandler {
+        @Override
+        public PhpType getType(PsiElement psiElement) {
+            if (!(psiElement instanceof Variable) || !psiElement.textMatches("$this")) {
+                return null;
+            }
+
+            Collection<? extends PhpNamedElement> phpNamedElements = ((VariableImpl) psiElement).resolveLocal();
+            for (PhpNamedElement phpNamedElement : phpNamedElements) {
+                if (!(phpNamedElement instanceof PhpClass phpClass)) {
+                    continue;
+                }
+
+                if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
+                    continue;
+                }
+
+                MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
+                ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
+                if (classMetadata == null) {
+                    continue;
+                }
+
+                PhpType phpType = new PhpType();
+                phpType.add("#" + key + phpClass.getFQN() + key);
+                return phpType;
+            }
+
+            return null;
+        }
     }
 
     @Override
+    public char getKey() {
+        return key;
+    }
+
+
+    @Override
     public @Nullable PhpType getType(PsiElement psiElement) {
-        if (!(psiElement instanceof Variable) || !psiElement.textMatches("$this")) {
-            return null;
-        }
 
         if (psiElement.getContainingFile().getVirtualFile() == null ||
                 psiElement.getContainingFile().getVirtualFile().getPath().contains(psiElement.getProject().getBasePath() + File.separator + "vendor")) {
@@ -44,25 +111,11 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
             return null;
         }
 
-        Collection<? extends PhpNamedElement> phpNamedElements = ((VariableImpl) psiElement).resolveLocal();
-        for (PhpNamedElement phpNamedElement : phpNamedElements) {
-            if (!(phpNamedElement instanceof PhpClass phpClass)) {
-                continue;
+        for (TypeHandler typeHandler : HANDLER) {
+            PhpType phpType = typeHandler.getType(psiElement);
+            if (phpType != null) {
+                return phpType;
             }
-
-            if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
-                continue;
-            }
-
-            MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
-            ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
-            if (classMetadata == null) {
-                continue;
-            }
-
-            PhpType phpType = new PhpType();
-            phpType.add("#" + getKey() + phpClass.getFQN() + getKey());
-            return phpType;
         }
 
         return null;
@@ -98,4 +151,6 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
         return null;
     }
+
+
 }
