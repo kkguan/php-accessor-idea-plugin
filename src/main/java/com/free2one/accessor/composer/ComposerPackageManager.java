@@ -21,28 +21,6 @@ public class ComposerPackageManager {
 
     private final Project project;
 
-    public enum DependentPackage {
-        PHP_ACCESSOR("free2one/php-accessor", "~0.3"),
-        HYPERF_PHP_ACCESSOR("free2one/hyperf-php-accessor", "~0.2"),
-        HYPERF_FRAMEWORK("hyperf/framework", "*");
-
-        private final String name;
-        private final String version;
-
-        DependentPackage(String name, String version) {
-            this.name = name;
-            this.version = version;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getVersion() {
-            return version;
-        }
-    }
-
     public ComposerPackageManager(Project project) {
         this.project = project;
     }
@@ -73,5 +51,27 @@ public class ComposerPackageManager {
                 ComposerActionStatistics.Action.REQUIRE,
                 ComposerUtils.getInstallationCommand(dependentPackage.getName(), dependentPackage.getVersion()));
         commandExecutor.execute();
+    }
+
+    public enum DependentPackage {
+        PHP_ACCESSOR("free2one/php-accessor", "~0.4"),
+        HYPERF_PHP_ACCESSOR("free2one/hyperf-php-accessor", "~0.3"),
+        HYPERF_FRAMEWORK("hyperf/framework", "*");
+
+        private final String name;
+        private final String version;
+
+        DependentPackage(String name, String version) {
+            this.name = name;
+            this.version = version;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getVersion() {
+            return version;
+        }
     }
 }

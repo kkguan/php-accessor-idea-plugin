@@ -27,12 +27,28 @@
     <li>Install <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>(Use  <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a> for Hyperf framework)</li>
     <li>Configure <code>{"scripts":{"php-accessor": "@php vendor/bin/php-accessor generate"}}</code>  to your <code>composer.json</code> file</li>
 </ul>
+<h2>Features</h2>
+<ul>
+    <li>Automatically generate accessors on save</li>
+    <li>Accessors will be navigated to class members</li>
+    <li>Support finding usages of class members, the plugin will help to locate all references of accessors</li>
+    <li>When renaming a class member, the plugin will also modify the accessor naming</li>
+    <li>Generate all setter call statements for object</li>
+</ul>
 <br/>
 <h2>安装</h2>
 <ul>
     <li>确保phpstorm中已正确配置composer<code>Settings -> PHP -> Composer -> Execution</code></li>
     <li>通过composer安装<a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>（Hyperf框架可直接使用  <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a>）</li>
     <li>项目<code>composer.json</code>文件中配置以下信息信息 <code>{"scripts":{"php-accessor": "@php vendor/bin/php-accessor generate"}}</code></li>
+</ul>
+<h2>功能</h2>
+<ul>
+    <li>保存时自动生成访问器</li>
+    <li>支持通过生成的访问器方法跳转至对应的类属性字段</li>
+    <li>支持类属性字段的"<a href="https://www.jetbrains.com/help/idea/find-highlight-usages.html">查找使用</a>"，插件将帮助找到访问器的所有引用位置</li>
+    <li>支持对类属性字段的"<a href="https://www.jetbrains.com/help/idea/refactoring-source-code.html">重命名重构</a>"，重构字段时将同步修改访问器及相关调用位置</li>
+    <li>一键生成对象的所有Setter调用语句</li>
 </ul>
   ]]></description>
 
@@ -94,12 +110,14 @@
         <group id="PHPAccessor" text="PHP Accessor" popup="true" icon="com.free2one.accessor.AccessorIcons.ACCESSOR">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="ReplaceInPath"/>
         </group>
-        <!-- 创建Halo Basic -->
         <action class="com.free2one.accessor.actions.GenerateAccessorAction"
                 id="accessor.actions.generate-accessor-action" description="Generate accessors">
             <add-to-group group-id="PHPAccessor"/>
         </action>
-
+        <action class="com.free2one.accessor.actions.GenerateObjectSettersAction"
+                id="accessor.actions.generate-object-setters-action" description="Generate object setters">
+            <add-to-group group-id="GenerateGroup" anchor="last"/>
+        </action>
     </actions>
 
 

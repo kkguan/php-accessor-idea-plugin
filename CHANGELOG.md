@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+* Feature 支持生成对象的Setter调用
+
 ## 0.4.2
 
 * Fix 修复部分场景下类型推断错误

@@ -7,13 +7,38 @@ import com.free2one.accessor.settings.AccessorSettings;
 import com.free2one.accessor.util.AnnotationSearchUtil;
 import com.intellij.openapi.application.ReadAction;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AccessorFinderService {
+
+    public <T extends PhpTypedElement> Map<String, Method> findSetterMethods(T phpTypedElement) {
+        Map<String, Method> accessMethods = new HashMap<>();
+        PhpType pendingType = phpTypedElement.getType().isComplete() ? phpTypedElement.getType() : phpTypedElement.getGlobalType();
+        for (String type : pendingType.getTypes()) {
+            if (PhpType.isPrimitiveType(type)) {
+                return accessMethods;
+            }
+        }
+
+        for (String classname : pendingType.getTypes()) {
+            Collection<PhpClass> phpNamedElements = PhpIndex.getInstance(phpTypedElement.getProject()).getClassesByFQN(classname);
+            for (PhpClass phpClass : phpNamedElements) {
+                phpClass.getMethods().stream()
+                        .filter(method -> method.getName().startsWith("set"))
+                        .forEach(method -> accessMethods.put(method.getName(), method));
+            }
+        }
+
+        return accessMethods;
+    }
 
 
     public boolean isAccessor(MethodReference reference) {
