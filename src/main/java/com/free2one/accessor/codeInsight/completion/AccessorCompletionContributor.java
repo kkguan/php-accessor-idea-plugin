@@ -1,24 +1,20 @@
 package com.free2one.accessor.codeInsight.completion;
 
-import com.free2one.accessor.settings.AccessorSettings;
+import com.free2one.accessor.AccessorFinderService;
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.Variable;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class AccessorCompletionContributor extends CompletionContributor {
     @Override
@@ -29,27 +25,23 @@ public class AccessorCompletionContributor extends CompletionContributor {
         }
 
         PsiElement element = parameters.getPosition().getPrevSibling().getPrevSibling();
-        AccessorSettings settings = element.getProject().getService(AccessorSettings.class);
         if (!(element instanceof Variable) ||
                 !((Variable) element).getName().equals("this")) {
             return;
         }
 
         PhpType phpType = ((Variable) element).getDeclaredType();
-        if (!phpType.isComplete()) {
+//        if (!phpType.isComplete()) {
+//            return;
+//        }
+
+        AccessorFinderService accessorFinderService = element.getProject().getService(AccessorFinderService.class);
+        Collection<Method> accessMethods = accessorFinderService.getGeneratedAccessorsByPhpType(phpType, element.getProject());
+        if (accessMethods.isEmpty()) {
             return;
         }
 
-        for (String classname : phpType.getTypes()) {
-            Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(element.getProject()).getClassesByFQN(classname)
-                    .stream()
-                    .filter(clazz -> settings.containProxyDirectory(clazz.getContainingFile().getVirtualFile().getPath()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-            phpNamedElements.forEach(clazz -> {
-                Collection<Method> methods = clazz.getMethods();
-                methods.forEach(method -> result.addElement(createLookupElement(method)));
-            });
-        }
+        accessMethods.forEach(method -> result.addElement(createLookupElement(method)));
     }
 
     private PhpLookupElement createLookupElement(Method method) {

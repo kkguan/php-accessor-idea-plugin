@@ -53,6 +53,19 @@ public final class AccessorSettings implements PersistentStateComponent<Accessor
         this.extraProxyDirectories = extraProxyDirectories;
     }
 
+    private String getFileSeparator() {
+        String separator;
+        if (project.getBasePath().lastIndexOf("/") != -1) {
+            separator = "/";
+        } else if (project.getBasePath().lastIndexOf("\\") != -1) {
+            separator = "\\";
+        } else {
+            separator = File.separator;
+        }
+
+        return separator;
+    }
+
     public void setExtraProxyDirectoriesFromText(String text) {
         this.extraProxyDirectories = Arrays.stream(text.trim().split("\\R")).filter(x -> !StringUtils.isBlank(x)).toArray(String[]::new);
     }
@@ -81,15 +94,6 @@ public final class AccessorSettings implements PersistentStateComponent<Accessor
         return false;
     }
 
-
-    public boolean containProxyDirectory(String path) {
-        if (path.contains(getProxyRootDirectory())) {
-            return true;
-        }
-
-        return false;
-    }
-
     public String getProxyRootDirectory() {
         if (proxyRootDirectory == null) {
             return project.getBasePath() + getFileSeparator() + ".php-accessor";
@@ -101,16 +105,7 @@ public final class AccessorSettings implements PersistentStateComponent<Accessor
         this.proxyRootDirectory = proxyRootDirectory;
     }
 
-    private String getFileSeparator() {
-        String separator;
-        if (project.getBasePath().lastIndexOf("/") != -1) {
-            separator = "/";
-        } else if (project.getBasePath().lastIndexOf("\\") != -1) {
-            separator = "\\";
-        } else {
-            separator = File.separator;
-        }
-        
-        return separator;
+    public boolean containProxyDirectory(String path) {
+        return path.contains(getProxyRootDirectory());
     }
 }

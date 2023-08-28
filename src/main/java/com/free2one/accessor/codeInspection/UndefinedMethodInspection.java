@@ -143,7 +143,7 @@ public class UndefinedMethodInspection extends PhpUndefinedMethodInspection {
         };
     }
 
-    protected boolean isUnresolvedType(Project project, @Nullable PhpExpression classReference, PhpType classReferenceType) {
+    public boolean isUnresolvedType(Project project, @Nullable PhpExpression classReference, PhpType classReferenceType) {
         PhpType filteredClassReferenceType = classReferenceType.filterUnknown().filterNull();
         if (!PhpType.isSubType(PhpType.MIXED, filteredClassReferenceType) && !PhpType.isSubType(PhpType.OBJECT, filteredClassReferenceType) && !filteredClassReferenceType.isEmpty()) {
             PhpIndex index = PhpIndex.getInstance(project);

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+* Fix 修复新版本IDEA中，无法正确对this完成代码提示
+
 ## 0.5.0
 
 * Feature 支持生成对象的Setter调用

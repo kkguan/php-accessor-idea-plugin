@@ -26,7 +26,11 @@ public class AccessorFindUsagesSearchScope extends GlobalSearchScope {
 
     @Override
     public boolean contains(@NotNull VirtualFile file) {
-        AccessorSettings settings = getProject().getService(AccessorSettings.class);
+        if (getProject() == null) {
+            return false;
+        }
+
+        AccessorSettings settings = AccessorSettings.getInstance(getProject());
         return !settings.containSettingDirectories(file.getPath());
     }
 }
