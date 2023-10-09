@@ -1,10 +1,9 @@
 package com.free2one.accessor.psi;
 
-import com.free2one.accessor.PhpAccessorClassnames;
+import com.free2one.accessor.AccessorFinderService;
 import com.free2one.accessor.meta.ClassMetadata;
 import com.free2one.accessor.meta.MethodMetaDataRepository;
 import com.free2one.accessor.settings.AccessorSettings;
-import com.free2one.accessor.util.AnnotationSearchUtil;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -27,7 +26,7 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
     public static final char key = 'Ȣ';
 
     private static final TypeHandler[] HANDLER;
-
+    
     static {
         HANDLER = new TypeHandler[]{new ParameterHandler(), new VariableThisHandler()};
     }
@@ -38,25 +37,19 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
 
     private static class ParameterHandler implements TypeHandler {
         public PhpType getType(PsiElement psiElement) {
-
             if (!(psiElement instanceof Parameter)) {
                 return null;
             }
 
             PhpType type = ((Parameter) psiElement).getDeclaredType();
-            MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
-            for (String classname : type.getTypes()) {
-                ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(classname);
-                if (classMetadata == null) {
-                    continue;
-                }
-
-                PhpType phpType = new PhpType();
-                phpType.add("#" + key + classname + key);
-                return phpType;
+            ClassMetadata metadata = psiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(type, psiElement.getProject());
+            if (metadata == null) {
+                return null;
             }
 
-            return null;
+            PhpType phpType = new PhpType();
+            phpType.add("#" + key + metadata.getClassname() + key);
+            return phpType;
         }
     }
 
@@ -68,27 +61,14 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
             }
 
             Collection<? extends PhpNamedElement> phpNamedElements = ((VariableImpl) psiElement).resolveLocal();
-            for (PhpNamedElement phpNamedElement : phpNamedElements) {
-                if (!(phpNamedElement instanceof PhpClass phpClass)) {
-                    continue;
-                }
-
-                if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
-                    continue;
-                }
-
-                MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(psiElement.getProject());
-                ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
-                if (classMetadata == null) {
-                    continue;
-                }
-
-                PhpType phpType = new PhpType();
-                phpType.add("#" + key + phpClass.getFQN() + key);
-                return phpType;
+            ClassMetadata metadata = psiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpNamedElements, psiElement.getProject());
+            if (metadata == null) {
+                return null;
             }
 
-            return null;
+            PhpType phpType = new PhpType();
+            phpType.add("#" + key + metadata.getClassname() + key);
+            return phpType;
         }
     }
 

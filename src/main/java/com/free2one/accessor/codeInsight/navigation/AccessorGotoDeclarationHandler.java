@@ -1,7 +1,7 @@
 package com.free2one.accessor.codeInsight.navigation;
 
+import com.free2one.accessor.AccessorFinderService;
 import com.free2one.accessor.meta.ClassMetadata;
-import com.free2one.accessor.meta.MethodMetaDataRepository;
 import com.free2one.accessor.settings.AccessorSettings;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -42,46 +42,6 @@ public class AccessorGotoDeclarationHandler implements GotoDeclarationHandler {
         return GotoDeclarationHandler.super.getActionText(context);
     }
 
-    private void methodDeclaration(PsiElement elementParent, PsiElement sourceElement, Collection<PsiElement> psiTargets) {
-        if (!(elementParent instanceof MethodReference sourceMethodReference) ||
-                sourceMethodReference.getNavigationElement() == null ||
-                !(sourceMethodReference.getNavigationElement() instanceof MethodReference) ||
-                ((MethodReference) sourceMethodReference.getNavigationElement()).getClassReference() == null) {
-            return;
-        }
-
-        PhpType sourceElementType = sourceMethodReference.getType();
-        PhpType pendingType = sourceElementType.isComplete() ? sourceElementType : sourceMethodReference.getClassReference().getGlobalType();
-        if (pendingType.getTypes().isEmpty()) {
-            pendingType = sourceMethodReference.getGlobalType();
-        }
-
-        MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(sourceElement.getProject());
-        AccessorSettings settings = sourceElement.getProject().getService(AccessorSettings.class);
-        for (String classname : pendingType.getTypes()) {
-            Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(sourceElement.getProject()).getClassesByFQN(classname);
-            for (PhpClass phpClass : phpNamedElements) {
-                if (settings.containSettingDirectories(phpClass.getContainingFile().getVirtualFile().getPath())) {
-                    continue;
-                }
-
-                Method method = phpClass.findMethodByName(sourceElement.getText());
-                if (method != null) {
-                    psiTargets.add(method);
-                    continue;
-                }
-
-                ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
-                if (classMetadata == null) {
-                    continue;
-                }
-
-                String fieldName = classMetadata.findFieldNameFromMethodName(sourceElement.getText());
-                phpClass.getFields().stream().filter(field -> field.getName().equals(fieldName)).findAny().ifPresent(psiTargets::add);
-            }
-        }
-    }
-
     private void classDeclaration(PsiElement elementParent, PsiElement sourceElement, Collection<PsiElement> psiTargets) {
         if (!(elementParent instanceof ClassReference clazz) ||
                 clazz.getNavigationElement() == null ||
@@ -98,6 +58,46 @@ public class AccessorGotoDeclarationHandler implements GotoDeclarationHandler {
                     .filter(c -> !settings.containSettingDirectories(c.getContainingFile().getVirtualFile().getPath()))
                     .collect(Collectors.toCollection(ArrayList::new));
             psiTargets.addAll(phpNamedElements);
+        }
+    }
+
+    private void methodDeclaration(PsiElement elementParent, PsiElement sourceElement, Collection<PsiElement> psiTargets) {
+        if (!(elementParent instanceof MethodReference sourceMethodReference) ||
+                sourceMethodReference.getNavigationElement() == null ||
+                !(sourceMethodReference.getNavigationElement() instanceof MethodReference) ||
+                ((MethodReference) sourceMethodReference.getNavigationElement()).getClassReference() == null) {
+            return;
+        }
+
+        PhpType sourceElementType = sourceMethodReference.getType();
+        PhpType pendingType = sourceElementType.isComplete() ? sourceElementType : sourceMethodReference.getClassReference().getGlobalType();
+        if (pendingType.getTypes().isEmpty()) {
+            pendingType = sourceMethodReference.getGlobalType();
+        }
+
+        AccessorSettings settings = sourceElement.getProject().getService(AccessorSettings.class);
+        AccessorFinderService accessorFinderService = sourceElement.getProject().getService(AccessorFinderService.class);
+        for (String classname : pendingType.getTypes()) {
+            Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(sourceElement.getProject()).getClassesByFQN(classname);
+            for (PhpClass phpClass : phpNamedElements) {
+                if (settings.containSettingDirectories(phpClass.getContainingFile().getVirtualFile().getPath())) {
+                    continue;
+                }
+
+                Method method = phpClass.findMethodByName(sourceElement.getText());
+                if (method != null) {
+                    psiTargets.add(method);
+                    continue;
+                }
+
+                ClassMetadata classMetadata = accessorFinderService.getAccessorMetadata(phpClass.getFQN(), phpClass.getProject());
+                if (classMetadata == null) {
+                    continue;
+                }
+
+                String fieldName = classMetadata.findFieldNameFromMethodName(sourceElement.getText());
+                phpClass.getFields().stream().filter(field -> field.getName().equals(fieldName)).findAny().ifPresent(psiTargets::add);
+            }
         }
     }
 

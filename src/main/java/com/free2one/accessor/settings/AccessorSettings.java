@@ -6,7 +6,6 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Transient;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -29,7 +28,6 @@ public final class AccessorSettings implements PersistentStateComponent<Accessor
 
     public AccessorSettings(@NotNull Project project) {
         this.project = project;
-//        System.out.println(project);
     }
 
     public static AccessorSettings getInstance(Project project) {
@@ -67,7 +65,21 @@ public final class AccessorSettings implements PersistentStateComponent<Accessor
     }
 
     public void setExtraProxyDirectoriesFromText(String text) {
-        this.extraProxyDirectories = Arrays.stream(text.trim().split("\\R")).filter(x -> !StringUtils.isBlank(x)).toArray(String[]::new);
+        this.extraProxyDirectories = Arrays.stream(text.trim().split("\\R")).filter(x -> !isBlank(x)).toArray(String[]::new);
+    }
+
+    private static boolean isBlank(String str) {
+        int strLen;
+        if (str != null && (strLen = str.length()) != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(str.charAt(i))) {
+                    return false;
+                }
+            }
+
+        }
+        
+        return true;
     }
 
     @Override

@@ -96,6 +96,56 @@ public class AccessorFinderService {
         return elements;
     }
 
+    public ClassMetadata getAccessorMetadata(PhpType type, Project project) {
+        MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
+        for (String classname : type.getTypes()) {
+            ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(classname);
+            if (classMetadata == null) {
+                continue;
+            }
+
+            return classMetadata;
+        }
+
+        return null;
+    }
+
+    public ClassMetadata getAccessorMetadata(Collection<? extends PhpNamedElement> phpNamedElements, Project project) {
+        MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
+        for (PhpNamedElement phpNamedElement : phpNamedElements) {
+            if (!(phpNamedElement instanceof PhpClass phpClass)) {
+                continue;
+            }
+
+            if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
+                continue;
+            }
+
+            ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpNamedElement.getFQN());
+            if (classMetadata == null) {
+                continue;
+            }
+
+            return classMetadata;
+        }
+
+        return null;
+    }
+
+    public ClassMetadata getAccessorMetadata(PhpClass phpClass, Project project) {
+        if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
+            return null;
+        }
+
+        MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
+        return methodMetaDataRepository.getFromClassname(phpClass.getFQN());
+    }
+
+    public ClassMetadata getAccessorMetadata(String classFQN, Project project) {
+        MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
+        return methodMetaDataRepository.getFromClassname(classFQN);
+    }
+
 
     public boolean isAccessor(MethodReference reference) {
         PhpType sourceElementType = reference.getType();

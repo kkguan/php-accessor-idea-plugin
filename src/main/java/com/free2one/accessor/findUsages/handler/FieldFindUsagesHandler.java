@@ -3,7 +3,6 @@ package com.free2one.accessor.findUsages.handler;
 import com.free2one.accessor.AccessorFinderService;
 import com.free2one.accessor.findUsages.AccessorFindUsagesSearchScope;
 import com.free2one.accessor.meta.ClassMetadata;
-import com.free2one.accessor.meta.MethodMetaDataRepository;
 import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ReadAction;
@@ -24,16 +23,14 @@ public class FieldFindUsagesHandler extends AccessorFindUsagesHandler {
 
     @Override
     public boolean findable() {
-        if (myPsiElement instanceof Field) {
-            PhpClass phpClass = ((Field) myPsiElement).getContainingClass();
-            if (phpClass != null) {
-                MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(myPsiElement.getProject());
-                ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
-                return classMetadata != null;
-            }
+        if (!(myPsiElement instanceof Field)) {
+            return false;
         }
 
-        return false;
+        PhpClass phpClass = ((Field) myPsiElement).getContainingClass();
+        ClassMetadata metadata = myPsiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpClass, myPsiElement.getProject());
+
+        return metadata != null;
     }
 
     @Override

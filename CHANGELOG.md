@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2
+
+* Feature 支持 233.* 版本
+
 ## 0.5.1
 
 * Fix 修复新版本IDEA中，无法正确对this完成代码提示

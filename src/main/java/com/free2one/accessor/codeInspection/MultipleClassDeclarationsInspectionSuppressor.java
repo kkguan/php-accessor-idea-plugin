@@ -1,7 +1,7 @@
 package com.free2one.accessor.codeInspection;
 
+import com.free2one.accessor.AccessorFinderService;
 import com.free2one.accessor.meta.ClassMetadata;
-import com.free2one.accessor.meta.MethodMetaDataRepository;
 import com.intellij.codeInspection.InspectionSuppressor;
 import com.intellij.codeInspection.SuppressQuickFix;
 import com.intellij.openapi.application.ReadAction;
@@ -38,10 +38,8 @@ public class MultipleClassDeclarationsInspectionSuppressor implements Inspection
                 return false;
             }
 
-            MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
-            ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(classFQN);
-
-            return classMetadata != null;
+            ClassMetadata metadata = project.getService(AccessorFinderService.class).getAccessorMetadata(classFQN, project);
+            return metadata != null;
         });
     }
 

@@ -1,7 +1,7 @@
 package com.free2one.accessor.codeInspection;
 
+import com.free2one.accessor.AccessorFinderService;
 import com.free2one.accessor.meta.ClassMetadata;
-import com.free2one.accessor.meta.MethodMetaDataRepository;
 import com.free2one.accessor.settings.AccessorSettings;
 import com.intellij.codeInspection.InspectionSuppressor;
 import com.intellij.codeInspection.SuppressQuickFix;
@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+/**
+ * Suppress unused field inspection when field has accessor
+ */
 public class UnusedFieldInspectionSuppressor {
 
     private static boolean fieldHasAccessor(PsiElement element) {
@@ -34,8 +37,7 @@ public class UnusedFieldInspectionSuppressor {
         }
 
         return ReadAction.compute(() -> {
-            MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(phpClass.getProject());
-            ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(phpClass.getFQN());
+            ClassMetadata classMetadata = element.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpClass.getFQN(), phpClass.getProject());
             if (classMetadata == null) {
                 return false;
             }
