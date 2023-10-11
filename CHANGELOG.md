@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3
+
+* Feature 增加对Laravel框架的依赖包安装提示
+
 ## 0.5.2
 
 * Feature 支持 233.* 版本

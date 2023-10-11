@@ -21,26 +21,50 @@
 ### 安装
 
 1. phpstorm中检索并安装插件`PHP Accessor`
+
 2. 确保phpstorm中已正确配置composer：`Settings -> PHP -> Composer -> Execution`
 
 3. 通过composer安装 <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>
-   （Hyperf框架可直接使用 <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a>）
+   （Hyperf框架 <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a> |
+   Laravel框架 <a href="https://github.com/kkguan/laravel-php-accessor">Laravel PHP Accessor</a>）
 
 4. 项目`composer.json` 文件中配置以下信息信息
+   ```json
+   {
+     "scripts": {
+       "php-accessor": "@php vendor/bin/php-accessor generate"
+     }
+   }
+   ```
 
-```json
+### 通过`#[Data]`注解原始类
+
+```php
+<?php
+namespace App;
+
+use PhpAccessor\Attribute\Data;
+
+#[Data]
+class Entity
 {
-  "scripts": {
-    "php-accessor": "@php vendor/bin/php-accessor generate"
-  }
+    private int $id;
+
+    private int $sex;
 }
 ```
 
+更多注解的使用说明,详见<a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>.
+
 ## 相关资源
 
-#### <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>: 生成类访问器（Getter & Setter）
+#### <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>: 访问器生成器
 
-#### <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a>: 服务启动时将自动生成访问器代理类,同时对原始类进行替换.
+#### <a href="https://github.com/kkguan/php-accessor-idea-plugin">PHP Accessor IDEA Plugin</a>: Phpstorm插件,文件保存时自动生成访问器.支持访问器的跳转,代码提示,查找及类字段重构等.
+
+#### <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a>: Hyperf框架SDK
+
+#### <a href="https://github.com/kkguan/laravel-php-accessor">Laravel PHP Accessor</a>: Laravel框架SDK
 
 
 

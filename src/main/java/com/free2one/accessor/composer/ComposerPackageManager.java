@@ -55,6 +55,8 @@ public class ComposerPackageManager {
 
     public enum DependentPackage {
         PHP_ACCESSOR("free2one/php-accessor", "~0.4"),
+        LARAVEL_FRAMEWORK("laravel/framework", "*"),
+        LARAVEL_PHP_ACCESSOR("free2one/laravel-php-accessor", "~0.3"),
         HYPERF_PHP_ACCESSOR("free2one/hyperf-php-accessor", "~0.3"),
         HYPERF_FRAMEWORK("hyperf/framework", "*");
 

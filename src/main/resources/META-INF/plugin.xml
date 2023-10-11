@@ -24,7 +24,7 @@
 <h2>Install</h2>
 <ul>
     <li>Confirm that composer has been configured in <code>Settings -> PHP -> Composer -> Execution</code></li>
-    <li>Install <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>(Use  <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a> for Hyperf framework)</li>
+    <li>Install <a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>(Hyperf framework <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a> |Laravel framework <a href="https://github.com/kkguan/laravel-php-accessor">Laravel PHP Accessor</a>)</li>
     <li>Configure <code>{"scripts":{"php-accessor": "@php vendor/bin/php-accessor generate"}}</code>  to your <code>composer.json</code> file</li>
 </ul>
 <h2>Features</h2>
@@ -39,7 +39,7 @@
 <h2>安装</h2>
 <ul>
     <li>确保phpstorm中已正确配置composer<code>Settings -> PHP -> Composer -> Execution</code></li>
-    <li>通过composer安装<a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>（Hyperf框架可直接使用  <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a>）</li>
+    <li>通过composer安装<a href="https://github.com/kkguan/php-accessor">PHP Accessor</a>（Hyperf框架 <a href="https://github.com/kkguan/hyperf-php-accessor">Hyperf PHP Accessor</a> | Laravel框架 <a href="https://github.com/kkguan/laravel-php-accessor">Laravel PHP Accessor</a>）</li>
     <li>项目<code>composer.json</code>文件中配置以下信息信息 <code>{"scripts":{"php-accessor": "@php vendor/bin/php-accessor generate"}}</code></li>
 </ul>
 <h2>功能</h2>

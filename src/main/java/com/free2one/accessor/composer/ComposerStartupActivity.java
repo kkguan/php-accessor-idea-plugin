@@ -9,7 +9,6 @@ public class ComposerStartupActivity implements StartupActivity {
 
     @Override
     public void runActivity(@NotNull Project project) {
-//        project.getMessageBus().connect().subscribe(VirtualFileManager.VFS_CHANGES, new ComposerBulkFileListener(project));
         EnvironmentDetectorManager environmentDetector = new EnvironmentDetectorManager(project);
         environmentDetector.scan();
     }

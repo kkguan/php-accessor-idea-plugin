@@ -40,7 +40,6 @@ public class EnvironmentDetectorManager {
 
     private void registerListener() {
         project.getService(ComposerDataService.class).addConfigListener(new MyComposerConfigListener(this));
-//        project.getMessageBus().connect().subscribe(VirtualFileManager.VFS_CHANGES, new MyComposerJsonListener(this));
     }
 
     public Project getProject() {
@@ -102,33 +101,5 @@ public class EnvironmentDetectorManager {
             manager.scan();
         }
     }
-
-
-//    public static class MyComposerJsonListener implements BulkFileListener {
-//
-//        private final EnvironmentDetectorManager manager;
-//
-//        public MyComposerJsonListener(EnvironmentDetectorManager manager) {
-//            this.manager = manager;
-//        }
-//
-//        @Override
-//        public void after(@NotNull List<? extends @NotNull VFileEvent> events) {
-//            ComposerDataService composerDataService = manager.getProject().getService(ComposerDataService.class);
-//            String configPath = composerDataService.getConfigPath();
-//            if (configPath == null) {
-//                return;
-//            }
-//
-//            boolean isPending = events.stream().anyMatch(vFileEvent -> {
-//                        System.out.println(vFileEvent.getPath());
-//                        return configPath.equals(vFileEvent.getPath());
-//                    }
-//            );
-//            if (isPending) {
-//                manager.scan(PackageInstallationDetector.class);
-//            }
-//        }
-//    }
 
 }

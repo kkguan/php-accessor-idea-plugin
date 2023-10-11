@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class ComposerBulkFileListener implements BulkFileListener {
-    
+
     public ComposerBulkFileListener() {
     }
 
@@ -45,6 +45,7 @@ public class ComposerBulkFileListener implements BulkFileListener {
         if (vFileEvent.getFile() == null) {
             return;
         }
+
         Project project = ProjectLocator.getInstance().guessProjectForFile(vFileEvent.getFile());
         if (project == null) {
             return;
@@ -101,10 +102,6 @@ public class ComposerBulkFileListener implements BulkFileListener {
             return false;
         }
 
-        if (!AnnotationSearchUtil.isAnnotatedWith(phpClasses, PhpAccessorClassnames.Data)) {
-            return false;
-        }
-
-        return true;
+        return AnnotationSearchUtil.isAnnotatedWith(phpClasses, PhpAccessorClassnames.Data);
     }
 }
