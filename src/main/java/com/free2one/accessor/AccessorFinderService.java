@@ -20,6 +20,12 @@ import java.util.stream.Collectors;
 
 public class AccessorFinderService {
 
+    private final Project project;
+
+    public AccessorFinderService(Project project) {
+        this.project = project;
+    }
+
     public <T extends PhpTypedElement> Map<String, Method> findSetterMethods(T phpTypedElement) {
         Map<String, Method> accessMethods = new HashMap<>();
         PhpType pendingType = phpTypedElement.getType().isComplete() ? phpTypedElement.getType() : phpTypedElement.getGlobalType();
@@ -30,7 +36,7 @@ public class AccessorFinderService {
         }
 
         for (String classname : pendingType.getTypes()) {
-            Collection<PhpClass> phpNamedElements = PhpIndex.getInstance(phpTypedElement.getProject()).getClassesByFQN(classname);
+            Collection<PhpClass> phpNamedElements = PhpIndex.getInstance(project).getClassesByFQN(classname);
             for (PhpClass phpClass : phpNamedElements) {
                 phpClass.getMethods().stream()
                         .filter(method -> method.getName().startsWith("set"))
@@ -41,7 +47,7 @@ public class AccessorFinderService {
         return accessMethods;
     }
 
-    public Collection<Method> getGeneratedAccessorsByPhpType(PhpType phpType, Project project) {
+    public Collection<Method> getGeneratedAccessorsByPhpType(PhpType phpType) {
         Collection<Method> accessMethods = new ArrayList<>();
         AccessorSettings settings = project.getService(AccessorSettings.class);
 
@@ -64,7 +70,7 @@ public class AccessorFinderService {
     public Collection<PsiElement> getGeneratedAccessorOfField(Field field) {
         Collection<PsiElement> elements = new ArrayList<>();
         PhpClass containingClass = field.getContainingClass();
-        Project project = field.getProject();
+
         if (containingClass == null) {
             return elements;
         }
@@ -96,7 +102,40 @@ public class AccessorFinderService {
         return elements;
     }
 
-    public ClassMetadata getAccessorMetadata(PhpType type, Project project) {
+    public Method getGeneratedAccessorOfField(Field field, Class<? extends AccessorMethod> accessorMethod) {
+        PhpClass containingClass = field.getContainingClass();
+        if (containingClass == null) {
+            return null;
+        }
+
+        MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
+        ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(containingClass.getFQN());
+        if (classMetadata == null) {
+            return null;
+        }
+
+        String methodName = classMetadata.findMethodNameFromFieldName(field.getName(), accessorMethod);
+        if (methodName == null) {
+            return null;
+        }
+
+        Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(project).getClassesByFQN(classMetadata.getClassname());
+        AccessorSettings settings = AccessorSettings.getInstance(project);
+        for (PhpClass clazz : phpNamedElements) {
+            if (!settings.containProxyDirectory(clazz.getContainingFile().getVirtualFile().getPath())) {
+                continue;
+            }
+
+            Method method = clazz.findMethodByName(methodName);
+            if (method != null) {
+                return method;
+            }
+        }
+
+        return null;
+    }
+
+    public ClassMetadata getAccessorMetadata(PhpType type) {
         MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
         for (String classname : type.getTypes()) {
             ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(classname);
@@ -110,7 +149,7 @@ public class AccessorFinderService {
         return null;
     }
 
-    public ClassMetadata getAccessorMetadata(Collection<? extends PhpNamedElement> phpNamedElements, Project project) {
+    public ClassMetadata getAccessorMetadata(Collection<? extends PhpNamedElement> phpNamedElements) {
         MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
         for (PhpNamedElement phpNamedElement : phpNamedElements) {
             if (!(phpNamedElement instanceof PhpClass phpClass)) {
@@ -132,7 +171,7 @@ public class AccessorFinderService {
         return null;
     }
 
-    public ClassMetadata getAccessorMetadata(PhpClass phpClass, Project project) {
+    public ClassMetadata getAccessorMetadata(PhpClass phpClass) {
         if (!AnnotationSearchUtil.isAnnotatedWith(phpClass, PhpAccessorClassnames.Data)) {
             return null;
         }
@@ -141,7 +180,7 @@ public class AccessorFinderService {
         return methodMetaDataRepository.getFromClassname(phpClass.getFQN());
     }
 
-    public ClassMetadata getAccessorMetadata(String classFQN, Project project) {
+    public ClassMetadata getAccessorMetadata(String classFQN) {
         MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
         return methodMetaDataRepository.getFromClassname(classFQN);
     }

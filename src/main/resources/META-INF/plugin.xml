@@ -71,6 +71,7 @@
         <projectService serviceImplementation="com.free2one.accessor.composer.ComposerPackageManager"/>
         <projectService serviceImplementation="com.free2one.accessor.settings.AccessorSettings"/>
         <projectService serviceImplementation="com.free2one.accessor.AccessorFinderService"/>
+        <projectService serviceImplementation="com.free2one.accessor.AccessorGeneratorService"/>
         <projectConfigurable
                 parentId="tools"
                 instance="com.free2one.accessor.settings.AccessorSettingsConfigurable"
@@ -113,6 +114,17 @@
         <action class="com.free2one.accessor.actions.GenerateAccessorAction"
                 id="accessor.actions.generate-accessor-action" description="Generate accessors">
             <add-to-group group-id="PHPAccessor"/>
+        </action>
+        <action id="PhpGenerateGetters"
+                class="com.free2one.accessor.actions.GenerateGettersAction" overrides="true" text="Getter..">
+        </action>
+        <action id="PhpGenerateGettersAndSetters"
+                class="com.free2one.accessor.actions.GenerateGettersAndSettersAction" overrides="true"
+                text="Getters and Setters..">
+        </action>
+        <action id="PhpGenerateSetters"
+                class="com.free2one.accessor.actions.GenerateSettersAction" overrides="true"
+                text="Setter..">
         </action>
         <action class="com.free2one.accessor.actions.GenerateObjectSettersAction"
                 id="accessor.actions.generate-object-setters-action" description="Generate object setters">

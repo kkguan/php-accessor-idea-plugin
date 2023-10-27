@@ -90,7 +90,7 @@ public class AccessorGotoDeclarationHandler implements GotoDeclarationHandler {
                     continue;
                 }
 
-                ClassMetadata classMetadata = accessorFinderService.getAccessorMetadata(phpClass.getFQN(), phpClass.getProject());
+                ClassMetadata classMetadata = accessorFinderService.getAccessorMetadata(phpClass.getFQN());
                 if (classMetadata == null) {
                     continue;
                 }

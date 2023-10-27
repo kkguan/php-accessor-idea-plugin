@@ -65,4 +65,14 @@ public class ClassMetadata {
                 .map(AccessorMethod::getMethodName)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
+
+    public String findMethodNameFromFieldName(String fieldName, Class<? extends AccessorMethod> accessorMethod) {
+        for (AccessorMethod method : methods) {
+            if (method.getClass().equals(accessorMethod) && method.getFieldName().equals(fieldName)) {
+                return method.getMethodName();
+            }
+        }
+
+        return null;
+    }
 }

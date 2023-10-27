@@ -1,6 +1,7 @@
 package com.free2one.accessor.composer;
 
 import com.intellij.execution.process.CapturingProcessAdapter;
+import com.intellij.openapi.progress.DumbProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.php.composer.ComposerDataService;
@@ -27,7 +28,7 @@ public class ComposerPackageManager {
 
     public ComposerPackage findPackage(DependentPackage dependentPackage) {
         ComposerExecution execution = ComposerDataService.getInstance(project).getComposerExecution();
-        ComposerCommandRunner executor = new ComposerCommandRunner(execution, project, project.getBasePath(), new ComposerProgressIndicator());
+        ComposerCommandRunner executor = new ComposerCommandRunner(execution, project, project.getBasePath(), new DumbProgressIndicator());
         CapturingProcessAdapter outputCapturingAdapter = new CapturingProcessAdapter();
         List<String> command = Arrays.asList("show", dependentPackage.getName(), "--no-ansi", "-d", project.getBasePath());
         ComposerCommandRunner.ExecutionResult executionResult = executor.runCommand(command, outputCapturingAdapter);
@@ -54,10 +55,10 @@ public class ComposerPackageManager {
     }
 
     public enum DependentPackage {
-        PHP_ACCESSOR("free2one/php-accessor", "~0.4"),
+        PHP_ACCESSOR("free2one/php-accessor", "~0.5.0"),
         LARAVEL_FRAMEWORK("laravel/framework", "*"),
-        LARAVEL_PHP_ACCESSOR("free2one/laravel-php-accessor", "~0.3"),
-        HYPERF_PHP_ACCESSOR("free2one/hyperf-php-accessor", "~0.3"),
+        LARAVEL_PHP_ACCESSOR("free2one/laravel-php-accessor", "~0.4.0"),
+        HYPERF_PHP_ACCESSOR("free2one/hyperf-php-accessor", "~0.4.0"),
         HYPERF_FRAMEWORK("hyperf/framework", "*");
 
         private final String name;

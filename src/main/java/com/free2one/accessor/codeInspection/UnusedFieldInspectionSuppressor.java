@@ -37,7 +37,7 @@ public class UnusedFieldInspectionSuppressor {
         }
 
         return ReadAction.compute(() -> {
-            ClassMetadata classMetadata = element.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpClass.getFQN(), phpClass.getProject());
+            ClassMetadata classMetadata = element.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpClass.getFQN());
             if (classMetadata == null) {
                 return false;
             }

@@ -28,7 +28,7 @@ public class FieldFindUsagesHandler extends AccessorFindUsagesHandler {
         }
 
         PhpClass phpClass = ((Field) myPsiElement).getContainingClass();
-        ClassMetadata metadata = myPsiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpClass, myPsiElement.getProject());
+        ClassMetadata metadata = myPsiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpClass);
 
         return metadata != null;
     }

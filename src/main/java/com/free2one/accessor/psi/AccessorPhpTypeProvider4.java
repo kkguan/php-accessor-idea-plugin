@@ -26,7 +26,7 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
     public static final char key = 'Ȣ';
 
     private static final TypeHandler[] HANDLER;
-    
+
     static {
         HANDLER = new TypeHandler[]{new ParameterHandler(), new VariableThisHandler()};
     }
@@ -42,7 +42,7 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
             }
 
             PhpType type = ((Parameter) psiElement).getDeclaredType();
-            ClassMetadata metadata = psiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(type, psiElement.getProject());
+            ClassMetadata metadata = psiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(type);
             if (metadata == null) {
                 return null;
             }
@@ -61,7 +61,7 @@ public class AccessorPhpTypeProvider4 implements PhpTypeProvider4 {
             }
 
             Collection<? extends PhpNamedElement> phpNamedElements = ((VariableImpl) psiElement).resolveLocal();
-            ClassMetadata metadata = psiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpNamedElements, psiElement.getProject());
+            ClassMetadata metadata = psiElement.getProject().getService(AccessorFinderService.class).getAccessorMetadata(phpNamedElements);
             if (metadata == null) {
                 return null;
             }

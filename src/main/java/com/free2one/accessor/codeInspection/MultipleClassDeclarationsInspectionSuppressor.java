@@ -38,7 +38,7 @@ public class MultipleClassDeclarationsInspectionSuppressor implements Inspection
                 return false;
             }
 
-            ClassMetadata metadata = project.getService(AccessorFinderService.class).getAccessorMetadata(classFQN, project);
+            ClassMetadata metadata = project.getService(AccessorFinderService.class).getAccessorMetadata(classFQN);
             return metadata != null;
         });
     }

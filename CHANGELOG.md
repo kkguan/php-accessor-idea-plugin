@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+* Feature 代理IDE内置的访问器生成动作(`Getter`、`Getters and Setters`及`Setter`)，相关动作生成的访问器命名将以PHPAccessor为准。
+
 ## 0.5.3
 
 * Feature 增加对Laravel框架的依赖包安装提示

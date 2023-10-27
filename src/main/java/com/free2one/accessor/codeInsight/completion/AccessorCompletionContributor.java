@@ -36,7 +36,7 @@ public class AccessorCompletionContributor extends CompletionContributor {
 //        }
 
         AccessorFinderService accessorFinderService = element.getProject().getService(AccessorFinderService.class);
-        Collection<Method> accessMethods = accessorFinderService.getGeneratedAccessorsByPhpType(phpType, element.getProject());
+        Collection<Method> accessMethods = accessorFinderService.getGeneratedAccessorsByPhpType(phpType);
         if (accessMethods.isEmpty()) {
             return;
         }
