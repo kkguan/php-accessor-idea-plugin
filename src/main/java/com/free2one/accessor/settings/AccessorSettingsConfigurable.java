@@ -27,7 +27,7 @@ public class AccessorSettingsConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        mySettingsComponent = new AccessorSettingsComponent();
+        mySettingsComponent = new AccessorSettingsComponent(project);
         return mySettingsComponent.getPanel();
     }
 
@@ -44,15 +44,13 @@ public class AccessorSettingsConfigurable implements Configurable {
     @Override
     public void apply() {
         settings.setProxyRootDirectory(mySettingsComponent.getProxyRootDirectoryText());
-        settings.setExtraProxyDirectoriesFromText(mySettingsComponent.getExtraProxyDirectoriesText());
-//        settings.setExtraProxyDirectories(mySettingsComponent.getExtraProxyDirectoriesText());
+        settings.setExtraProxyDirectories(mySettingsComponent.getExtraProxyDirectories());
     }
 
     @Override
     public void reset() {
         mySettingsComponent.setProxyRootDirectoryText(settings.getProxyRootDirectory());
-        mySettingsComponent.setExtraProxyDirectoriesText(settings.getExtraProxyDirectories2String());
-//        mySettingsComponent.setExtraProxyDirectoriesText(settings.getExtraProxyDirectories(project));
+        mySettingsComponent.setExtraProxyDirectories(settings.getExtraProxyDirectories());
     }
 
     @Override

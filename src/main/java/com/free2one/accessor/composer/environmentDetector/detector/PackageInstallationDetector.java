@@ -2,6 +2,7 @@ package com.free2one.accessor.composer.environmentDetector.detector;
 
 import com.free2one.accessor.AccessorBundle;
 import com.free2one.accessor.composer.ComposerPackageManager;
+import com.free2one.accessor.composer.PackageInstalledNotifier;
 import com.free2one.accessor.util.NotificationUtil;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
@@ -59,6 +60,9 @@ public class PackageInstallationDetector implements EnvironmentDetector {
 
             ComposerPackage hyperfPhpAccessorPackage = project.getService(ComposerPackageManager.class).findPackage(ComposerPackageManager.DependentPackage.HYPERF_PHP_ACCESSOR);
             if (hyperfPhpAccessorPackage != null) {
+                PackageInstalledNotifier publisher = project.getMessageBus()
+                        .syncPublisher(PackageInstalledNotifier.ACCESSOR_PACKAGE_INSTALL_TOPIC);
+                publisher.installed(hyperfPhpAccessorPackage, ComposerPackageManager.DependentPackage.HYPERF_PHP_ACCESSOR);
                 return false;
             }
 

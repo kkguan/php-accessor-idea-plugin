@@ -58,7 +58,7 @@ public class ComposerPackageManager {
         PHP_ACCESSOR("free2one/php-accessor", "~0.5.0"),
         LARAVEL_FRAMEWORK("laravel/framework", "*"),
         LARAVEL_PHP_ACCESSOR("free2one/laravel-php-accessor", "~0.4.0"),
-        HYPERF_PHP_ACCESSOR("free2one/hyperf-php-accessor", "~0.4.0"),
+        HYPERF_PHP_ACCESSOR("free2one/hyperf-php-accessor", "~0.5.0"),
         HYPERF_FRAMEWORK("hyperf/framework", "*");
 
         private final String name;

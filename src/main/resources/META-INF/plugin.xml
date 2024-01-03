@@ -60,7 +60,8 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <postStartupActivity implementation="com.free2one.accessor.composer.ComposerStartupActivity"/>
+        <postStartupActivity implementation="com.free2one.accessor.settings.SyncFrameworkConfig"/>
+        <postStartupActivity implementation="com.free2one.accessor.composer.EnvironmentDetector"/>
         <!--        <psi.treeChangeListener implementation="com.free2one.accessor.psi.AccessorTreeChangeListener"/>-->
         <gotoDeclarationHandler
                 implementation="com.free2one.accessor.codeInsight.navigation.AccessorGotoDeclarationHandler"/>

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1
+
+* Feature 优化配置界面
+* Feature 识别Hyperf框架的配置文件并同步到IDEA的插件配置中
+
 ## 0.6.0
 
 * Feature 代理IDE内置的访问器生成动作(`Getter`、`Getters and Setters`及`Setter`)，相关动作生成的访问器命名将以PHPAccessor为准。
