@@ -7,8 +7,10 @@ import com.intellij.codeInspection.SuppressQuickFix;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocType;
 import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,12 +23,15 @@ public class MultipleClassDeclarationsInspectionSuppressor implements Inspection
         }
 
         PsiElement parentElement = element.getParent();
-        if (parentElement instanceof ClassReference classReference) {
-            return metadataExisted(classReference.getProject(), classReference.getFQN());
-        }
+        Class<?>[] classes = new Class<?>[]{ClassReference.class, PhpClass.class, PhpDocType.class};
+        for (Class<?> clazz : classes) {
+            if (clazz.isInstance(parentElement)) {
+                if (!(parentElement instanceof PhpReference phpReference)) {
+                    continue;
+                }
 
-        if (parentElement instanceof PhpClass phpClass) {
-            return metadataExisted(phpClass.getProject(), phpClass.getFQN());
+                return metadataExisted(parentElement.getProject(), phpReference.getFQN());
+            }
         }
 
         return false;
