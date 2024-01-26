@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocType;
 import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.PhpReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,12 +26,17 @@ public class MultipleClassDeclarationsInspectionSuppressor implements Inspection
         PsiElement parentElement = element.getParent();
         Class<?>[] classes = new Class<?>[]{ClassReference.class, PhpClass.class, PhpDocType.class};
         for (Class<?> clazz : classes) {
-            if (clazz.isInstance(parentElement)) {
-                if (!(parentElement instanceof PhpReference phpReference)) {
-                    continue;
-                }
+            if (!clazz.isInstance(parentElement)) {
+                continue;
+            }
 
-                return metadataExisted(parentElement.getProject(), phpReference.getFQN());
+            if (parentElement instanceof PhpReference phpReference) {
+                // interim solution: PhpDocType has a problem getting FQM, so get type directly here
+                return metadataExisted(parentElement.getProject(), phpReference.getType().toString());
+            }
+
+            if (parentElement instanceof PhpNamedElement phpNamedElement) {
+                return metadataExisted(parentElement.getProject(), phpNamedElement.getFQN());
             }
         }
 
@@ -44,6 +50,7 @@ public class MultipleClassDeclarationsInspectionSuppressor implements Inspection
             }
 
             ClassMetadata metadata = project.getService(AccessorFinderService.class).getAccessorMetadata(classFQN);
+
             return metadata != null;
         });
     }
