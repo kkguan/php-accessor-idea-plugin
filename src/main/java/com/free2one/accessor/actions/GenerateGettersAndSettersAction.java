@@ -16,13 +16,31 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This class extends PhpGenerateGettersAndSettersAction to generate both getter and setter methods for PHP classes.
+ */
 public class GenerateGettersAndSettersAction extends PhpGenerateGettersAndSettersAction {
 
+    /**
+     * Handler for generating field accessors.
+     */
     private final PhpGenerateFieldAccessorHandlerBase myHandler = new GenerateFieldAccessorHandlerBase() {
+        /**
+         * Creates accessors for a given PHP class and field.
+         * @param targetClass The PHP class to generate accessors for.
+         * @param field The field to generate accessors for.
+         * @return An array of PhpAccessorMethodData representing the generated accessors.
+         */
         protected PhpAccessorMethodData[] createAccessors(PhpClass targetClass, PsiElement field) {
             return (new PhpAccessorsGenerator(targetClass, (Field) field)).createAccessors(this.isFluentSetters(), false);
         }
 
+        /**
+         * Checks if a field in a PHP class is selectable for generating accessors.
+         * @param phpClass The PHP class containing the field.
+         * @param field The field to check.
+         * @return true if no getters and setters exist for the field, false otherwise.
+         */
         protected boolean isSelectable(PhpClass phpClass, Field field) {
             if (field.isReadonly()) {
                 return false;
@@ -33,13 +51,21 @@ public class GenerateGettersAndSettersAction extends PhpGenerateGettersAndSetter
         }
 
         protected @Nls String getErrorMessage() {
-            return PhpBundle.message("no.private.fields.to.generate.both.getters.and.setters.for", new Object[0]);
+            return PhpBundle.message("no.private.fields.to.generate.both.getters.and.setters.for");
         }
 
+        /**
+         * Checks if the handler contains setters.
+         * @return true as this handler is for generating setters.
+         */
         protected boolean containsSetters() {
             return true;
         }
 
+        /**
+         * Checks if the handler contains getters.
+         * @return true as this handler is for generating getters.
+         */
         protected boolean containsGetters() {
             return true;
         }

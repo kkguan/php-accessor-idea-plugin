@@ -35,7 +35,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This abstract class extends PhpGenerateFieldAccessorHandlerBase to generate field accessors.
+ */
 public abstract class GenerateFieldAccessorHandlerBase extends PhpGenerateFieldAccessorHandlerBase {
+
     public void invoke(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
         PhpFile phpFile = (PhpFile) file;
         PhpClass targetClass = PhpCodeEditUtil.findClassAtCaret(editor, phpFile);
@@ -49,28 +53,30 @@ public abstract class GenerateFieldAccessorHandlerBase extends PhpGenerateFieldA
             if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
                 HintManager.getInstance().showErrorHint(editor, this.getErrorMessage());
             }
-        } else {
-            PhpNamedElementNode[] members = this.chooseMembers(fieldsToShow, true, file.getProject());
-            if (members == null || members.length == 0) {
-                return;
-            }
-
-            int insertPos = getSuitableEditorPosition(editor, (PhpFile) file);
-            boolean genByPhpAccessor = AnnotationSearchUtil.isAnnotatedWith(targetClass, PhpAccessorClassnames.Data);
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                if (genByPhpAccessor) {
-                    targetClass.getProject().getService(AccessorGeneratorService.class).generate(targetClass.getContainingFile().getVirtualFile().getPath(), result -> {
-                        if (!result.isSuccess()) {
-                            return;
-                        }
-
-                        genAccessorsToFile(members, targetClass, project, editor, file, insertPos, true);
-                    });
-                } else {
-                    genAccessorsToFile(members, targetClass, project, editor, file, insertPos, false);
-                }
-            });
+            
+            return;
         }
+
+        PhpNamedElementNode[] members = this.chooseMembers(fieldsToShow, true, file.getProject());
+        if (members == null || members.length == 0) {
+            return;
+        }
+
+        int insertPos = getSuitableEditorPosition(editor, (PhpFile) file);
+        boolean genByPhpAccessor = AnnotationSearchUtil.isAnnotatedWith(targetClass, PhpAccessorClassnames.Data);
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            if (genByPhpAccessor) {
+                targetClass.getProject().getService(AccessorGeneratorService.class).generate(targetClass.getContainingFile().getVirtualFile().getPath(), result -> {
+                    if (!result.isSuccess()) {
+                        return;
+                    }
+
+                    genAccessorsToFile(members, targetClass, project, editor, file, insertPos, true);
+                });
+            } else {
+                genAccessorsToFile(members, targetClass, project, editor, file, insertPos, false);
+            }
+        });
     }
 
     // same as in PhpGenerateFieldAccessorHandlerBase,just to make it accessible
@@ -203,10 +209,8 @@ public abstract class GenerateFieldAccessorHandlerBase extends PhpGenerateFieldA
                     accessorMethodData.add(phpAccessorMethodData);
                 }
             }
-
             return accessorMethodData.toArray(new PhpAccessorMethodData[0]);
         } else {
-
             return this.createAccessors(targetClass, field);
         }
     }

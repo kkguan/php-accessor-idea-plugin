@@ -23,8 +23,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * This class extends AnAction to generate accessors for PHP classes.
+ */
 public class GenerateAccessorAction extends AnAction {
 
+    /**
+     * This method is called when the action is performed.
+     * It generates accessors for the selected files in the project.
+     *
+     * @param e AnActionEvent object containing information about the event that triggered this action.
+     */
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
@@ -34,25 +43,31 @@ public class GenerateAccessorAction extends AnAction {
         }
 
         for (VirtualFile file : files) {
-            ComposerCommandExecutor commandExecutor = this.commandExecutor(project, file);
-            commandExecutor.execute();
+            this.executeCommand(project, file);
         }
 
         VirtualFile proxyFile = LocalFileSystem.getInstance().findFileByPath(AccessorSettings.getInstance(project).getProxyRootDirectory());
         if (proxyFile == null) {
             return;
         }
+
         proxyFile.refresh(false, true);
     }
 
-    private ComposerCommandExecutor commandExecutor(Project project, VirtualFile file) {
+    /**
+     * Executes the command to generate accessors for a given file in the project.
+     *
+     * @param project The current project.
+     * @param file    The file to generate accessors for.
+     */
+    private void executeCommand(Project project, VirtualFile file) {
         List<String> command = project.getService(AccessorGeneratorService.class).getCommandForGenerate(file.getPath());
         ComposerExecution execution = ComposerDataService.getInstance(project).getComposerExecution();
         ComposerDataService composerDataService = project.getService(ComposerDataService.class);
         VirtualFile configFile = composerDataService.getConfigFile();
         ComposerActionStatistics statistics = ComposerActionStatistics.create(ComposerActionStatistics.Action.RUN_SCRIPT_FROM_CONTEXT, "");
 
-        return new ComposerActionCommandExecutor.WithConfig(project, execution, configFile, "", statistics, true, true) {
+        new ComposerActionCommandExecutor.WithConfig(project, execution, configFile, "", statistics, true, true) {
             protected @Nls(
                     capitalization = Nls.Capitalization.Title
             ) @NotNull String getTaskTitle() {
@@ -83,7 +98,6 @@ public class GenerateAccessorAction extends AnAction {
             protected ThrowableNotNullFunction<Project, ComposerCommandExecutor, ExecutionException> getExecutorGenerator() {
                 return null;
             }
-        };
+        }.execute();
     }
-
 }

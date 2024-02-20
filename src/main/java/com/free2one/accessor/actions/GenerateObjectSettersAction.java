@@ -28,12 +28,21 @@ import icons.PhpIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * This class extends CodeInsightAction to provide functionality for generating object setters.
+ */
 public class GenerateObjectSettersAction extends CodeInsightAction {
 
+    /**
+     * Checks if the current file is valid for this action.
+     *
+     * @param project The current project.
+     * @param editor  The current editor.
+     * @param file    The current file.
+     * @return true if the file is a PhpFile and the current element is a PsiWhiteSpace, false otherwise.
+     */
     @Override
     protected boolean isValidForFile(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
         int offset = editor.getCaretModel().getOffset();
@@ -42,6 +51,11 @@ public class GenerateObjectSettersAction extends CodeInsightAction {
         return file instanceof PhpFile && element instanceof PsiWhiteSpace;
     }
 
+    /**
+     * Returns the handler for this action.
+     *
+     * @return A new instance of LanguageCodeInsightActionHandler.
+     */
     @Override
     protected @NotNull CodeInsightActionHandler getHandler() {
         return new LanguageCodeInsightActionHandler() {
@@ -64,75 +78,85 @@ public class GenerateObjectSettersAction extends CodeInsightAction {
                 file.acceptChildren(visitor);
 
                 if (setterElements.isEmpty()) {
-                    if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
-                        HintManager.getInstance().showErrorHint(editor, AccessorBundle.message("action.accessor.actions.generate-object-setters-action.no-elements-to-generate"));
-                    }
+                    showErrorHint(editor, "action.accessor.actions.generate-object-setters-action.no-elements-to-generate");
                     return;
                 }
 
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    MemberChooser<SetterObjectElement> chooser = new MemberChooser<>(setterElements.toArray(new SetterObjectElement[0]), true, false, project);
-                    chooser.setCopyJavadocVisible(false);
-                    chooser.show();
+                ApplicationManager.getApplication().invokeLater(() -> processSelectedNodes(project, editor, cursorPosition, setterElements, file));
+            }
 
-                    List<SetterObjectElement> selectedNodes = chooser.getSelectedElements();
-                    if (selectedNodes == null) {
-                        return;
+            private void showErrorHint(Editor editor, String message) {
+                if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
+                    HintManager.getInstance().showErrorHint(editor, AccessorBundle.message(message));
+                }
+            }
+
+            private void processSelectedNodes(Project project, Editor editor, int cursorPosition, List<SetterObjectElement> setterElements, @NotNull PsiFile file) {
+                MemberChooser<SetterObjectElement> chooser = new MemberChooser<>(setterElements.toArray(new SetterObjectElement[0]), true, false, project);
+                chooser.setCopyJavadocVisible(false);
+                chooser.show();
+
+                List<SetterObjectElement> selectedNodes = chooser.getSelectedElements();
+                if (selectedNodes == null) {
+                    return;
+                }
+
+                StringBuffer textBuf = new StringBuffer();
+                AccessorFinderService accessorFinderService = project.getService(AccessorFinderService.class);
+                for (SetterObjectElement selectedNode : selectedNodes) {
+                    PsiElement targetElement = selectedNode.getPsiElement();
+                    Map<String, Method> methods = accessorFinderService.findSetterMethods((PhpTypedElement) targetElement);
+
+                    if (targetElement instanceof VariableImpl variable) {
+                        appendMethods(textBuf, variable.getName(), methods);
+                    } else if (targetElement instanceof Parameter parameter) {
+                        appendMethods(textBuf, parameter.getName(), methods);
+                    } else if (targetElement instanceof Field field) {
+                        appendMethods(textBuf, "this->" + field.getName(), methods);
                     }
+                }
 
-                    StringBuffer textBuf = new StringBuffer();
-                    AccessorFinderService accessorFinderService = project.getService(AccessorFinderService.class);
-                    for (SetterObjectElement selectedNode : selectedNodes) {
-                        PsiElement targetElement = selectedNode.getPsiElement();
-                        Map<String, Method> methods = accessorFinderService.findSetterMethods((PhpTypedElement) targetElement);
+                if (textBuf.isEmpty()) {
+                    showErrorHint(editor, "action.accessor.actions.generate-object-setters-action.no-setter-methods-found");
+                    return;
+                }
 
-                        if (targetElement instanceof VariableImpl variable) {
-                            for (Method method : methods.values()) {
-                                textBuf.append("$").append(variable.getName()).append("->").append(method.getName()).append("();").append("\n");
-                            }
-                        } else if (targetElement instanceof Parameter parameter) {
-                            for (Method method : methods.values()) {
-                                textBuf.append("$").append(parameter.getName()).append("->").append(method.getName()).append("();").append("\n");
-                            }
-                        } else if (targetElement instanceof Field field) {
-                            for (Method method : methods.values()) {
-                                textBuf.append("$this->").append(field.getName()).append("->").append(method.getName()).append("();").append("\n");
-                            }
-                        }
-                    }
+                insertGeneratedText(project, editor, cursorPosition, textBuf, file);
+            }
 
-                    if (textBuf.isEmpty()) {
-                        if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
-                            HintManager.getInstance().showErrorHint(editor, AccessorBundle.message("action.accessor.actions.generate-object-setters-action.no-setter-methods-found"));
-                        }
-                        return;
-                    }
+            private void appendMethods(StringBuffer textBuf, String variableName, Map<String, Method> methods) {
+                for (Method method : methods.values()) {
+                    textBuf.append("$").append(variableName).append("->").append(method.getName()).append("();").append("\n");
+                }
+            }
 
-                    ApplicationManager.getApplication().runWriteAction(
-                            () -> CommandProcessor.getInstance().executeCommand(
-                                    project,
-                                    () -> {
-                                        editor.getDocument().insertString(cursorPosition, textBuf);
-                                        int endPos = cursorPosition + textBuf.length();
-                                        CodeStyleManager.getInstance(project).reformatText(file, cursorPosition, endPos);
-                                        PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
-                                    },
-                                    "GenerateObjectSetters",
-                                    null
-                            )
-                    );
-                });
+            private void insertGeneratedText(Project project, Editor editor, int cursorPosition, StringBuffer textBuf, @NotNull PsiFile file) {
+                ApplicationManager.getApplication().runWriteAction(
+                        () -> CommandProcessor.getInstance().executeCommand(
+                                project,
+                                () -> {
+                                    editor.getDocument().insertString(cursorPosition, textBuf);
+                                    int endPos = cursorPosition + textBuf.length();
+                                    CodeStyleManager.getInstance(project).reformatText(file, cursorPosition, endPos);
+                                    PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
+                                },
+                                "GenerateObjectSetters",
+                                null
+                        )
+                );
             }
         };
     }
 
+    /**
+     * This class extends PhpElementVisitor to provide functionality for visiting PHP elements.
+     */
     private static class Visitor extends PhpElementVisitor {
 
         private final int cursorPosition;
-
         private final PsiElement sourceElementParent;
-
         private final List<SetterObjectElement> setterElements;
+        private final Set<Object> uniqueObjects = new HashSet<>();
 
         public Visitor(PsiElement sourceElementParent, List<SetterObjectElement> setterElements, int cursorPosition) {
             this.sourceElementParent = sourceElementParent;
@@ -152,6 +176,7 @@ public class GenerateObjectSettersAction extends CodeInsightAction {
             if (isDefinedBelowCursor(parameter)) {
                 return;
             }
+
             if (parameter.getParent().getParent().equals(sourceElementParent.getParent())) {
                 setterElements.add(new SetterObjectElement(parameter));
             }
@@ -166,9 +191,13 @@ public class GenerateObjectSettersAction extends CodeInsightAction {
             if (isDefinedBelowCursor(variable)) {
                 return;
             }
+
             for (String type :
                     variable.getType().getTypes()) {
-                if (!PhpType.isPrimitiveType(type) && variable.getParent().getParent().getParent().equals(sourceElementParent)) {
+                if (!PhpType.isPrimitiveType(type)
+                        && variable.getParent().getParent().getParent().equals(sourceElementParent)
+                        && uniqueObjects.add(variable.getName())
+                ) {
                     setterElements.add(new SetterObjectElement(variable));
                     break;
                 }
@@ -197,12 +226,21 @@ public class GenerateObjectSettersAction extends CodeInsightAction {
         }
     }
 
-
+    /**
+     * This class extends PsiElementMemberChooserObject and implements ClassMember.
+     * It provides functionality for choosing setter object elements.
+     */
     private static class SetterObjectElement extends PsiElementMemberChooserObject implements ClassMember {
         SetterObjectElement(@NotNull PsiElement psiElement) {
             super(psiElement, getText(psiElement), getIcon(psiElement));
         }
 
+        /**
+         * Returns the text representation of the given element.
+         *
+         * @param element The element to get the text representation of.
+         * @return The text representation of the element.
+         */
         private static String getText(PsiElement element) {
             if (element instanceof Function) {
                 PsiElement parent = element.getParent();
@@ -225,6 +263,12 @@ public class GenerateObjectSettersAction extends CodeInsightAction {
             }
         }
 
+        /**
+         * Returns the icon of the given element.
+         *
+         * @param element The element to get the icon of.
+         * @return The icon of the element.
+         */
         private static Icon getIcon(PsiElement element) {
             if (element instanceof PhpNamedElement) {
                 return ((PhpNamedElement) element).getIcon();
@@ -266,5 +310,4 @@ public class GenerateObjectSettersAction extends CodeInsightAction {
             return new SetterObjectElement(parent);
         }
     }
-
 }
