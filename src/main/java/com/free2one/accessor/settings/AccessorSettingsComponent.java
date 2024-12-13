@@ -24,12 +24,17 @@ import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.ListTableModel;
 import com.jetbrains.php.debug.PhpDebugUtil;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.*;
 
@@ -139,33 +144,53 @@ public class AccessorSettingsComponent {
         toolbarDecorator.setMoveUpActionUpdater(moveUpDownUpdater);
         toolbarDecorator.setMoveDownActionUpdater(moveUpDownUpdater);
 
-//        proxyRootDirectory.addActionListener(
-//                new ComponentWithBrowseButton.BrowseFolderActionListener<>(
-//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
-//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
-//                        this.proxyRootDirectory,
-//                        myProject,
-//                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-//                        TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-//                ) {
-////            protected @NotNull String expandPath(@NotNull String path) {
-////                return AccessorSettingsComponent.doExpandPath(path, AccessorSettingsComponent.this.myProject);
-////            }
-//        });
+//         public BrowseFolderActionListener(@Nullable ComponentWithBrowseButton<T> textField, @Nullable Project project, FileChooserDescriptor fileChooserDescriptor, TextComponentAccessor<? super T> accessor) {
+//            super(project, fileChooserDescriptor, textField != null ? textField.getChildComponent() : null, accessor);
+//        }
+//
+//        /** @deprecated */
+//        @Deprecated(
+//            forRemoval = true
+//        )
+//        public BrowseFolderActionListener(@Nullable @DialogTitle String title, @Nullable @Label String description, @Nullable ComponentWithBrowseButton<T> textField, @Nullable Project project, FileChooserDescriptor fileChooserDescriptor, TextComponentAccessor<? super T> accessor) {
+//            this(textField, project, fileChooserDescriptor.withTitle(title).withDescription(description), accessor);
+//        }
 
-        proxyRootDirectory.addActionListener(
-                new ComponentWithBrowseButton.BrowseFolderActionListener<>(
-//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
-//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
+
+        ActionListener listener ;
+        Class<ComponentWithBrowseButton.BrowseFolderActionListener> browseFolderActionListener = ComponentWithBrowseButton.BrowseFolderActionListener.class;
+        try {
+            Constructor<ComponentWithBrowseButton.BrowseFolderActionListener> constructor = browseFolderActionListener.getDeclaredConstructor(String.class,String.class, ComponentWithBrowseButton.class,Project.class, FileChooserDescriptor.class, TextComponentAccessor.class);
+            Annotation deprecated = constructor.getAnnotation(Deprecated.class);
+            if (deprecated == null) {
+                listener = constructor.newInstance(
+                        AccessorBundle.message("settings.extra-proxy-directories.text"),
+                        AccessorBundle.message("settings.extra-proxy-directories.text"),
                         this.proxyRootDirectory,
                         myProject,
                         FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                         TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-                ) {
-//            protected @NotNull String expandPath(@NotNull String path) {
-//                return AccessorSettingsComponent.doExpandPath(path, AccessorSettingsComponent.this.myProject);
-//            }
-                });
+                );
+            } else {
+                constructor = browseFolderActionListener.getDeclaredConstructor(ComponentWithBrowseButton.class,Project.class, FileChooserDescriptor.class, TextComponentAccessor.class);
+                listener = constructor.newInstance(
+                        this.proxyRootDirectory,
+                        myProject,
+                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                        TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+                );
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+//                public BrowseFolderActionListener(@Nullable @DialogTitle String title, @Nullable @Label String description, @Nullable ComponentWithBrowseButton<T> textField, @Nullable Project project, FileChooserDescriptor fileChooserDescriptor, TextComponentAccessor<? super T> accessor) {
+//            this(textField, project, fileChooserDescriptor.withTitle(title).withDescription(description), accessor);
+//        }
+
+        proxyRootDirectory.addActionListener(listener);
+
+
 
         myMainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(AccessorBundle.message("settings.proxy-root-directory.text")), proxyRootDirectory, 1, false)
