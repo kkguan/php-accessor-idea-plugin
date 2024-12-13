@@ -139,11 +139,33 @@ public class AccessorSettingsComponent {
         toolbarDecorator.setMoveUpActionUpdater(moveUpDownUpdater);
         toolbarDecorator.setMoveDownActionUpdater(moveUpDownUpdater);
 
-        proxyRootDirectory.addActionListener(new ComponentWithBrowseButton.BrowseFolderActionListener<>(AccessorBundle.message("settings.extra-proxy-directories.text"), AccessorBundle.message("settings.extra-proxy-directories.text"), this.proxyRootDirectory, myProject, FileChooserDescriptorFactory.createSingleFolderDescriptor(), TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
+//        proxyRootDirectory.addActionListener(
+//                new ComponentWithBrowseButton.BrowseFolderActionListener<>(
+//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
+//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
+//                        this.proxyRootDirectory,
+//                        myProject,
+//                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+//                        TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+//                ) {
+////            protected @NotNull String expandPath(@NotNull String path) {
+////                return AccessorSettingsComponent.doExpandPath(path, AccessorSettingsComponent.this.myProject);
+////            }
+//        });
+
+        proxyRootDirectory.addActionListener(
+                new ComponentWithBrowseButton.BrowseFolderActionListener<>(
+//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
+//                        AccessorBundle.message("settings.extra-proxy-directories.text"),
+                        this.proxyRootDirectory,
+                        myProject,
+                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                        TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+                ) {
 //            protected @NotNull String expandPath(@NotNull String path) {
 //                return AccessorSettingsComponent.doExpandPath(path, AccessorSettingsComponent.this.myProject);
 //            }
-        });
+                });
 
         myMainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(AccessorBundle.message("settings.proxy-root-directory.text")), proxyRootDirectory, 1, false)
