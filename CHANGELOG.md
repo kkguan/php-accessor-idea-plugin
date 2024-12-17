@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.6
+
+* Feature 支持 243.* 版本
+
 ## 0.6.5
 
 * Feature 支持 242.* 版本
