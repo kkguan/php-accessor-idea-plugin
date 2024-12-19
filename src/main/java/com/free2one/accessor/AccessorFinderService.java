@@ -6,6 +6,7 @@ import com.free2one.accessor.method.AccessorMethod;
 import com.free2one.accessor.settings.AccessorSettings;
 import com.free2one.accessor.util.AnnotationSearchUtil;
 import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
@@ -67,6 +68,41 @@ public class AccessorFinderService {
         return accessMethods;
     }
 
+//    public Collection<PsiElement> getGeneratedAccessorOfField(Field field) {
+//        Collection<PsiElement> elements = new ArrayList<>();
+//        PhpClass containingClass = field.getContainingClass();
+//
+//        if (containingClass == null) {
+//            return elements;
+//        }
+//
+//        MethodMetaDataRepository methodMetaDataRepository = new MethodMetaDataRepository(project);
+//        ClassMetadata classMetadata = methodMetaDataRepository.getFromClassname(containingClass.getFQN());
+//        if (classMetadata == null) {
+//            return elements;
+//        }
+//
+//        Collection<String> relevantMethods = classMetadata.findMethodNamesFromFieldName(field.getName());
+//        if (relevantMethods.isEmpty()) {
+//            return elements;
+//        }
+//
+//        Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(project).getClassesByFQN(classMetadata.getClassname());
+//        AccessorSettings settings = AccessorSettings.getInstance(project);
+//        for (PhpClass clazz : phpNamedElements) {
+//            if (!settings.containProxyDirectory(clazz.getContainingFile().getVirtualFile().getPath())) {
+//                continue;
+//            }
+//
+//            Collection<Method> relatedMethods = clazz.getMethods().stream()
+//                    .filter(method -> relevantMethods.contains(method.getName()) && containingClass.findMethodByName(method.getName()) == null)
+//                    .toList();
+//            elements.addAll(relatedMethods);
+//        }
+//
+//        return elements;
+//    }
+
     public Collection<PsiElement> getGeneratedAccessorOfField(Field field) {
         Collection<PsiElement> elements = new ArrayList<>();
         PhpClass containingClass = field.getContainingClass();
@@ -86,17 +122,35 @@ public class AccessorFinderService {
             return elements;
         }
 
-        Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(project).getClassesByFQN(classMetadata.getClassname());
-        AccessorSettings settings = AccessorSettings.getInstance(project);
-        for (PhpClass clazz : phpNamedElements) {
-            if (!settings.containProxyDirectory(clazz.getContainingFile().getVirtualFile().getPath())) {
-                continue;
-            }
+        DumbService dumbService = DumbService.getInstance(project);
+        if (dumbService.isDumb()) {
+            dumbService.runWhenSmart(() -> {
+                Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(project).getClassesByFQN(classMetadata.getClassname());
+                AccessorSettings settings = AccessorSettings.getInstance(project);
+                for (PhpClass clazz : phpNamedElements) {
+                    if (!settings.containProxyDirectory(clazz.getContainingFile().getVirtualFile().getPath())) {
+                        continue;
+                    }
 
-            Collection<Method> relatedMethods = clazz.getMethods().stream()
-                    .filter(method -> relevantMethods.contains(method.getName()) && containingClass.findMethodByName(method.getName()) == null)
-                    .toList();
-            elements.addAll(relatedMethods);
+                    Collection<Method> relatedMethods = clazz.getMethods().stream()
+                            .filter(method -> relevantMethods.contains(method.getName()) && containingClass.findMethodByName(method.getName()) == null)
+                            .toList();
+                    elements.addAll(relatedMethods);
+                }
+            });
+        } else {
+            Collection<? extends PhpClass> phpNamedElements = PhpIndex.getInstance(project).getClassesByFQN(classMetadata.getClassname());
+            AccessorSettings settings = AccessorSettings.getInstance(project);
+            for (PhpClass clazz : phpNamedElements) {
+                if (!settings.containProxyDirectory(clazz.getContainingFile().getVirtualFile().getPath())) {
+                    continue;
+                }
+
+                Collection<Method> relatedMethods = clazz.getMethods().stream()
+                        .filter(method -> relevantMethods.contains(method.getName()) && containingClass.findMethodByName(method.getName()) == null)
+                        .toList();
+                elements.addAll(relatedMethods);
+            }
         }
 
         return elements;
