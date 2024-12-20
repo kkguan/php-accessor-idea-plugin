@@ -12,6 +12,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -25,6 +26,7 @@ import com.jetbrains.php.composer.ComposerInitSupportAction;
 import com.jetbrains.php.composer.ComposerUtils;
 import com.jetbrains.php.composer.statistics.ComposerActionStatistics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -44,14 +46,7 @@ public class ComposerConfigDetector implements EnvironmentDetector {
             return;
         }
 
-        NotificationUtil.notify(project, AccessorBundle.message("composer.missing.config"), new NotificationAction(AccessorBundle.message("composer.install")) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
-                CustomComposerInitSupportAction composerInitSupportAction = new CustomComposerInitSupportAction();
-                composerInitSupportAction.actionPerformed(e);
-                notification.expire();
-            }
-        });
+        NotificationUtil.notify(project, AccessorBundle.message("composer.missing.config"), new CustomComposerInitSupportAction());
     }
 
     private static class CustomComposerInitSupportAction extends ComposerInitSupportAction {
@@ -136,6 +131,24 @@ public class ComposerConfigDetector implements EnvironmentDetector {
                     return potentialConfigParent == null ? null : (VirtualFile)parentToConfig.get(potentialConfigParent).iterator().next();
                 }
             }
+        }
+
+
+        public static @Nullable VirtualFile getParentFolder(@NotNull Project project) {
+            if (project == null) {
+                return null;
+            }
+
+            VirtualFile parentFolder = project.getBaseDir();
+            if (parentFolder == null) {
+                ProjectRootManager instance = ProjectRootManager.getInstance(project);
+                VirtualFile[] roots = instance.getContentSourceRoots();
+                if (roots.length > 0) {
+                    parentFolder = roots[0];
+                }
+            }
+
+            return parentFolder == null ? null : parentFolder;
         }
     }
 }
