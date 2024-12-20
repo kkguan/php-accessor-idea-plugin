@@ -46,12 +46,20 @@ public class ComposerConfigDetector implements EnvironmentDetector {
             return;
         }
 
-        NotificationUtil.notify(project, AccessorBundle.message("composer.missing.config"), new CustomComposerInitSupportAction());
+        NotificationUtil.notify(project, AccessorBundle.message("composer.missing.config"), new NotificationAction(AccessorBundle.message("composer.install")) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent, @NotNull Notification notification) {
+
+                CustomComposerInitSupportAction composerInitSupportAction = new CustomComposerInitSupportAction();
+                composerInitSupportAction.action(anActionEvent);
+
+                notification.expire();
+            }
+        });
     }
 
     private static class CustomComposerInitSupportAction extends ComposerInitSupportAction {
-        @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
+        public void action(@NotNull AnActionEvent e) {
 
             if (e == null) {
                 return;
