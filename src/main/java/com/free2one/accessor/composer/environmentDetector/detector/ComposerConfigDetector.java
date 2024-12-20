@@ -29,7 +29,7 @@ public class ComposerConfigDetector implements EnvironmentDetector {
         NotificationUtil.notify(project, AccessorBundle.message("composer.missing.config"), new NotificationAction(AccessorBundle.message("composer.install")) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
-                ComposerInitSupportAction composerInitSupportAction = new ComposerInitSupportAction();
+                CustomComposerInitSupportAction composerInitSupportAction = new CustomComposerInitSupportAction();
                 composerInitSupportAction.actionPerformed(e);
                 notification.expire();
             }
