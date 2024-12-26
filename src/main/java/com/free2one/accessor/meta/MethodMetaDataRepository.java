@@ -5,10 +5,7 @@ import com.free2one.accessor.settings.AccessorSettings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellij.json.JsonFileType;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.PathManager;
-import com.intellij.openapi.application.ReadAction;
-import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.application.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -36,30 +33,6 @@ public class MethodMetaDataRepository {
         this.basePath = project.getBasePath();
     }
 
-//    public ClassMetadata getFromClassname(String classname) {
-//        Path phpFilePath = PathManager.findBinFile(getDir() + File.separator + decodeFileName(classname) + "." + fileExtension);
-//        if (Optional.ofNullable(phpFilePath).isEmpty()) {
-//            return null;
-//        }
-//
-//        Gson gson = new GsonBuilder()
-//                .serializeNulls()
-//                .registerTypeAdapter(AccessorMethod.class, AccessorMethodDeserializerFactory.create())
-//                .create();
-//        VirtualFile file = VfsUtil.findFile(phpFilePath, true);
-//        if (Optional.ofNullable(file).isEmpty()) {
-//            return null;
-//        }
-//
-////        file.refresh(false, false);
-//        try {
-//            String json = new String(file.getInputStream().readAllBytes());
-//            return gson.fromJson(json, ClassMetadata.class);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     public ClassMetadata getFromClassname(String classname) {
         Path phpFilePath = PathManager.findBinFile(getDir() + File.separator + decodeFileName(classname) + "." + fileExtension);
         if (Optional.ofNullable(phpFilePath).isEmpty()) {
@@ -76,11 +49,18 @@ public class MethodMetaDataRepository {
             return null;
         }
 
-//        WriteAction.run(() -> file.refresh(false, false));
+//        ApplicationManager.getApplication().invokeLater(() -> {
+//            WriteAction.run(() -> file.refresh(false, false));
+//        }, ModalityState.defaultModalityState());
 
-//        ApplicationManager.getApplication().invokeAndWait(() -> WriteAction.run(() -> file.refresh(false, false)));
-        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> file.refresh(false, false)));
-
+        // 判断文件是否上锁，上锁则等到解锁后再读取
+        while (!file.isWritable()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         try {
             String json = new String(file.getInputStream().readAllBytes());
