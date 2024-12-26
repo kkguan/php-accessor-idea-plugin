@@ -11,6 +11,9 @@ version = properties("pluginVersion")
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://www.jetbrains.com/intellij-repository/releases")
+    }
 }
 
 // Configure Gradle IntelliJ Plugin
